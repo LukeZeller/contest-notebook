@@ -53,7 +53,6 @@ struct rope
     {
         if (!curr) return {NULL, NULL};
         curr -> pushLazy(); /*PS*/
-
         pair <node*, node*> res;
         if (getSize(curr -> l) <= index)
         {
@@ -73,7 +72,6 @@ struct rope
         if (a) a -> pushLazy(); /*PS*/
         if (b) b -> pushLazy(); /*PS*/
         if (!a or !b) return a ? a: b;
-
         if (a -> priority >= b -> priority)
         {
             a -> r = meld(a -> r, b);
