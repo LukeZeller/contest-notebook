@@ -47,8 +47,8 @@ struct segmentTree
 
     void modify(int p, int v)
     {
-        elements[p + sz].modify(v);
-        for (p = (p + sz) >> 1; p >= 1; p >>= 1)
+        elements[p += sz].modify(v);
+        for (p >>= 1; p >= 1; p >>= 1)
         {
             elements[p] = elements[p << 1].combine(elements[p << 1 | 1]);
         }
