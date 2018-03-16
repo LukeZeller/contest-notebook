@@ -77,14 +77,12 @@ struct rope
         if (a -> priority >= b -> priority)
         {
             a -> r = meld(a -> r, b);
-            a -> refresh();
-            return a;
+            return a -> refresh();
         }
         else
         {
             b -> l = meld(a, b -> l);
-            b -> refresh();
-            return b;
+            return b -> refresh();
         }
     }
 
