@@ -1,5 +1,5 @@
 /*
-* Description: treap (implicit treap w/ reversing)
+* Description: rope (implicit treap w/ reversing)
 * Demo: insert, erase range, reverse range, concat, substr
 */
 
