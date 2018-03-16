@@ -97,8 +97,7 @@ struct rope
 
     void meldRange(vector <node*> &n)
     {
-        root = NULL;
-        for (int i = 0; i < n.size(); i++) root = meld(root, n[i]);
+        root = meld(root = meld(n[0], n[1]), n[2]);
     }
 
     void insert(int p, int v) //PS: all following functions are independent
