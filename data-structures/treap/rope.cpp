@@ -1,5 +1,5 @@
 /*
-* Description: rope (implicit treap w/ reversing)
+* Description: treap (implicit treap w/ reversing)
 * Demo: insert, erase range, reverse range, concat, substr
 */
 
@@ -25,7 +25,7 @@ struct node
         return this;
     }
 
-    void pushLazy() /*PS*/
+    void pushLazy() //PS: see above
     {
         if (rev)
         {
@@ -40,11 +40,11 @@ struct node
     void resetReverse(){rev = false;} /*PS*/
 };
 
-struct rope
+struct treap
 {
     node* root;
 
-    rope()
+    treap()
     {
         root = NULL;
     }
@@ -84,7 +84,6 @@ struct rope
         }
     }
 
-    int size(){return getSize(root);} /*PS*/
     int getSize(node* &n){return n ? n -> sz : 0;}
 
     vector<node*> splitRange(int l, int r)
@@ -100,7 +99,9 @@ struct rope
         root = meld(root = meld(n[0], n[1]), n[2]);
     }
 
-    void insert(int p, int v) //PS: all following functions are independent
+    int size(){return getSize(root);} //PS: all following functions are independent/optional
+
+    void insert(int p, int v)
     {
         vector <node*> n(3);
         n[1] = new node(v);
@@ -114,7 +115,7 @@ struct rope
         root = meld(n[0], n[2]);
     }
 
-    void concat(rope &o)
+    void concat(treap &o)
     {
         root = meld(root, o.root);
     }
@@ -147,33 +148,33 @@ struct rope
 
 int main()
 {
-    rope rp;
+    treap trp;
     string s = "hello";
-    for (char c: s) rp.insert(rp.size(), c - 'a');
+    for (char c: s) trp.insert(trp.size(), c - 'a');
 
     //Expected: hel
-    for (int i: rp.substr(0, 3)) cout<<char(i + 'a');
+    for (int i: trp.substr(0, 3)) cout<<char(i + 'a');
     cout<<'\n';
 
-    rope rp2;
+    treap trp2;
     string t = "world";
-    for (char c: t) rp2.insert(rp2.size(), c - 'a');
+    for (char c: t) trp2.insert(trp2.size(), c - 'a');
 
-    rp.concat(rp2);
+    trp.concat(trp2);
     //Expected: helloworld
-    for (int i: rp.substr(0, rp.size())) cout<<char(i + 'a');;
+    for (int i: trp.substr(0, trp.size())) cout<<char(i + 'a');;
     cout<<'\n';
 
-    rp.reverse(2, 4);
+    trp.reverse(2, 4);
     //Expected: heollworld
-    for (int i: rp.substr(0, rp.size())) cout<<char(i + 'a');;
+    for (int i: trp.substr(0, trp.size())) cout<<char(i + 'a');;
     cout<<'\n';
 
-    rp.erase(3, rp.size() - 3);
-    rp.erase(0, 0);
+    trp.erase(3, trp.size() - 3);
+    trp.erase(0, 0);
     //Expected: eold
-    for (int i: rp.substr(0, rp.size())) cout<<char(i + 'a');;
+    for (int i: trp.substr(0, trp.size())) cout<<char(i + 'a');;
     cout<<'\n';
-
+    
     return 0;
 }
