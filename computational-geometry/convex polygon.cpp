@@ -1,6 +1,6 @@
 /*
 * Description: convex polygon algorithms
-* Demo: shoelace formula, convex hull, polygon rotation, point inclusion, tangents to a point, area of modified convex hull (add only)
+* Demo: andrew monotone chain, point inclusion (triangle, convex polygon), tangents to a point, shoelace formula, area of modified convex hull (add only), vertex rotation
 */
 
 #include <iostream>
@@ -39,19 +39,6 @@ typedef vector<pt> polygon;
 int prev(int i, int n, int st = 1){return (i - st + n) % n;}
 int next(int i, int n, int st = 1){return (i + st) % n;};
 
-vector <ptlT> getShoelaces(polygon &poly) /*PS*/
-{
-    int sz = poly.size();
-    vector <ptlT> shoelace(sz + 1);
-    for (int i = 0; i < sz; i++)
-    {
-        shoelace[i + 1] = shoelace[i] + (poly[i] ^ poly[next(i, sz)]); //Caution !! returns doubled/oriented area -> cw: negative
-    }
-    return shoelace;
-}
-
-ptlT polygonArea(polygon &poly){return getShoelaces(poly)[poly.size()];} /*PS*/
-
 polygon andrewMonotoneChain(polygon &points, bool strict = true) //strict -> redundant points excluded
 {
     sort(points.begin(), points.end());
@@ -74,17 +61,6 @@ polygon andrewMonotoneChain(polygon &points, bool strict = true) //strict -> red
     return hull;
 }
 
-polygon rotatePolygon(polygon &poly, int shift = 0) /*PS*/
-{
-    if (shift == 0) shift = min_element(poly.begin(), poly.end()) - poly.begin();
-    polygon res(poly.size());
-    for (int i = 0; i < poly.size(); i++)
-    {
-        res[i] = poly[(i + shift) % poly.size()];
-    }
-    return res;
-}
-
 int pointInTriangle(polygon &triangle, pt &p) /*PS*/
 {
     int orient[3];
@@ -103,6 +79,19 @@ pair <int, int> pointInConvexPolygon(polygon &poly, pt &point) //PS: requires po
     polygon triangle = {poly[pos - 1], poly[pos], poly[0]};
     return {pointInTriangle(triangle, point), pos};
 } //inside: -1, outside: 1, on: 0
+
+vector <ptlT> getShoelaces(polygon &poly) /*PS*/
+{
+    int sz = poly.size();
+    vector <ptlT> shoelace(sz + 1);
+    for (int i = 0; i < sz; i++)
+    {
+        shoelace[i + 1] = shoelace[i] + (poly[i] ^ poly[next(i, sz)]); //Caution !! returns doubled/oriented area -> cw: negative
+    }
+    return shoelace;
+}
+
+ptlT polygonArea(polygon &poly){return getShoelaces(poly)[poly.size()];} /*PS*/
 
 pair <int, int> findTangentsConvexPolygon(polygon &poly, pt p) //PS: requires pointInConvexPolygon
 {
@@ -147,7 +136,18 @@ ptlT addPointConvexPolygonArea(polygon &poly, vector <ptlT> &shoelace, pt &p) //
     else return shoelace[lt] - shoelace[rt] + newArea;
 }
 
-polygon addPointConvexPolygon(polygon &poly, pt &p) //PS: requires findTangent()
+polygon rotatePolygon(polygon &poly, int shift = 0) /*PS*/
+{
+    if (shift == 0) shift = min_element(poly.begin(), poly.end()) - poly.begin();
+    polygon res(poly.size());
+    for (int i = 0; i < poly.size(); i++)
+    {
+        res[i] = poly[(i + shift) % poly.size()];
+    }
+    return res;
+}
+
+polygon addPointConvexPolygon(polygon &poly, pt &p) //PS: requires findTangent(), rotatePolygon()
 {
     auto tangents = findTangentsConvexPolygon(poly, p);
     int lt = tangents.first, rt = tangents.second;
