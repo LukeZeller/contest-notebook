@@ -1,5 +1,5 @@
 /*
-* Description: Dinic's algorithm for max flow
+* Description: dinic's algorithm for max flow
 * Demo: space efficient capacity/flow storage, flow can be reset
 */
 
