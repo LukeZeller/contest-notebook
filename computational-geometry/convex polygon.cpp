@@ -23,13 +23,13 @@ struct pt
     bool operator < (const pt &o) const {return make_pair(y, x) < make_pair(o.y, o.x);}
     bool operator == (const pt &o) const {return abs(x - o.x) < EPS and abs(y - o.y) < EPS;}
 
-    pt operator - (const pt &o){return {x - o.x, y - o.y};}
+    pt operator - (const pt &o) const {return {x - o.x, y - o.y};}
 
-    ptlT operator ^ (const pt &o){return (ptlT) x * o.y - (ptlT) y * o.x;}
-    ptlT operator * (const pt &o){return (ptlT) x * o.x + (ptlT) y * o.y;}
+    ptlT operator ^ (const pt &o) const {return (ptlT) x * o.y - (ptlT) y * o.x;}
+    ptlT operator * (const pt &o) const {return (ptlT) x * o.x + (ptlT) y * o.y;}
 
-    ptlT norm2(){return *this * *this;}
-    ptlT dist2(const pt &o){return (*this - o).norm2();}
+    ptlT norm2() const {return *this * *this;}
+    ptlT dist2(const pt &o) const {return (*this - o).norm2();}
 };
 
 int sgn(ptlT i) {return (i > -EPS) - (i < EPS);}
