@@ -1,3 +1,7 @@
+/*
+* Description: binary exponentiation and prime modular inverse
+*/
+
 #include <iostream>
 
 using namespace std;
