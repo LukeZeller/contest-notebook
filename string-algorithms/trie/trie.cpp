@@ -1,5 +1,5 @@
 /*
-* Description: binary trie
+* Description: trie
 * Demo: exists() checks if s is in trie, numPrefixes() gives number of distinct prefixes of s in trie
 */
 
