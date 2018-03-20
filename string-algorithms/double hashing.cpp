@@ -10,7 +10,7 @@ using namespace std;
 
 #define ll long long
 
-const int MAXN = 300005;
+const int MAXN = 300005; /*PS*/
 const int alpha = 37;
 const int MOD[2] = {1000000007, 1000000009};
 
@@ -58,7 +58,7 @@ struct hashPair
     void pop(){h[0].pop(), h[1].pop();}
     void init(const string &s){h[0].init(s), h[1].init(s);}
 
-    vector <int> findMatches(hashPair &th)
+    vector <int> findMatches(hashPair &th) /*PS*/
     {
         vector <int> matches;
         auto target = th.query(0, th.length() - 1);
