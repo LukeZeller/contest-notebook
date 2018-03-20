@@ -55,6 +55,11 @@ struct binaryLift
         }
         return table[l][0];
     }
+
+    int distance(int i, int j)
+    {
+        return depths[i] + depths[j] - 2 * depths[lca(i, j)];
+    }
 };
 
 void addEdge(graph &g, int i, int j)
@@ -72,6 +77,8 @@ int main()
     auto bl = binaryLift(g);
     //Expected: 0 1 0 1
     cout<<bl.lca(0, 0)<<" "<<bl.lca(3, 4)<<" "<<bl.lca(3, 2)<<" "<<bl.lca(4, 1)<<'\n';
+    //Expected: 0 2 3 1
+    cout<<bl.distance(0, 0)<<" "<<bl.distance(3, 4)<<" "<<bl.distance(3, 2)<<" "<<bl.distance(4, 1)<<'\n';
 
     return 0;
 }
