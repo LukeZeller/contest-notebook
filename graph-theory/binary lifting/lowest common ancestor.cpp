@@ -49,10 +49,9 @@ struct binaryLift
                 r = table[r][i];
         }
         if (l == r) return l;
-        for (int i = h - 1; i >= 0; i--)
+        for (int i = h - 1; i >= 0; i--) if (table[l][i] != table[r][i])
         {
-            if (table[l][i] != table[r][i])
-                l = table[l][i], r = table[r][i];
+            l = table[l][i], r = table[r][i];
         }
         return table[l][0];
     }
