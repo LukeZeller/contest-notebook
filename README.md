@@ -1,2 +1,2 @@
 # contest-notebook
-Stores template code for programming contests
+Template code storage for programming contests
