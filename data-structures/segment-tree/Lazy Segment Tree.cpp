@@ -1,11 +1,10 @@
 /*
-* Description: lazy propagation segment tree
+* Description: lazy propagation segment tree with pointers
 * Demo: increment range update, max range query
 */
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
@@ -14,24 +13,26 @@ using namespace std;
 struct node
 {
     int maxVal, lazy;
-    bool isLazy;
+    int lb, rb, isLazy;
     node *l, *r;
 
-    node(){maxVal = -INF, resetLazy();} //PS: remember max -> -INF, min -> +INF, sum -> 0
-    void combine(node &a, node &b){l = &a, r = &b, refresh();}
+    node() : l(NULL), r(NULL) {maxVal = -INF, resetLazy();} /*PS*/
+    node(node &a, node &b) : l(&a), r(&b) {refresh();}
     void init(int i){maxVal = i;}
 
-    void refresh()
+    node* refresh()
     {
         maxVal = max(l -> maxVal, r -> maxVal); /*PS*/
+        return this;
     }
 
-    void pushLazy(int lb, int rb)
+    void pushLazy()
     {
         if (isLazy)
         {
             maxVal += lazy; /*PS*/
-            if (lb != rb) l -> setLazy(lazy), r -> setLazy(lazy);
+            if (lb != rb)
+                l -> setLazy(lazy), r -> setLazy(lazy);
             resetLazy();
         }
     }
@@ -42,52 +43,49 @@ struct node
 
 struct segmentTree
 {
-    int sz, defaultValue = 0; //can also use values from some vector
-    vector <node> elements;
-    vector <int> lb, rb;
+    int sz, defaultValue = 0;
+    node* root;
 
     segmentTree(){}
     segmentTree(int s)
     {
-        sz = s;
-        elements.resize(4 * sz), lb.resize(4 * sz), rb.resize(4 * sz);
-        build(0, sz - 1);
+        root = new node(), sz = s;
+        build(root, 0, sz - 1);
     }
 
-    void build(int l, int r, int p = 1)
+    void build(node* &curr, int l, int r)
     {
-        lb[p] = l, rb[p] = r;
-        if (l == r) {elements[p].init(defaultValue); return;}
+        curr -> lb = l, curr -> rb = r;
+        if (l == r) {curr -> init(defaultValue); return;}
         int m = (l + r) >> 1;
-        build(l, m, p << 1), build(m + 1, r, p << 1 | 1);
-        elements[p].combine(elements[p << 1], elements[p << 1 | 1]);
+        build(curr -> l = new node(), l, m), build(curr -> r = new node(), m + 1, r);
+        curr -> refresh();
     }
 
-    int query(int l, int r){return query(l, r, 1).maxVal;} /*PS*/
-    node query(int l, int r, int p)
+    int query(int l, int r) {return query(root, l, r).maxVal;} //PS
+    node query(node* &curr, int l, int r)
     {
-        push(p);
-        if (lb[p] > r or rb[p] < l) return node();
-        if (lb[p] >= l and rb[p] <= r) return elements[p];
-        node res, ql = query(l, r, p << 1), qr = query(l, r, p << 1 | 1);
-        res.combine(ql, qr);
-        return res;
+        curr -> pushLazy();
+        if (curr -> lb > r or curr -> rb < l) return node();
+        if (curr -> lb >= l and curr -> rb <= r) return *curr;
+        node lq = query(curr -> l, l, r), rq = query(curr -> r, l, r);
+        return node(lq, rq);
     }
 
-    void modify(int l, int r, int v, int p = 1)
+    void modify(int l, int r, int v) {modify(root, l, r, v);}
+    void modify(node* &curr, int l, int r, int v)
     {
-        push(p);
-        if (lb[p] > r or rb[p] < l) return;
-        if (lb[p] >= l and rb[p] <= r)
+        curr -> pushLazy();
+        if (curr -> lb > r or curr -> rb < l) return;
+        if (curr -> lb >= l and curr -> rb <= r)
         {
-            elements[p].setLazy(v), push(p);
+            curr -> setLazy(v);
+            curr -> pushLazy();
             return;
         }
-        modify(l, r, v, p << 1), modify(l, r, v, p << 1 | 1);
-        elements[p].refresh();
+        modify(curr -> l, l, r, v), modify(curr -> r, l, r, v);
+        curr -> refresh();
     }
-
-    void push(int p){elements[p].pushLazy(lb[p], rb[p]);}
 };
 
 int main()
