@@ -1,3 +1,8 @@
+/*
+* Description: lazy propagation segment tree
+* Demo: increment range update, max range query
+*/
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
