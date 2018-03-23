@@ -6,14 +6,18 @@
 #include <iostream>
 #include <vector>
 #include <tuple>
+#include <random>
+#include <ctime>
 
 using namespace std;
+
+const int INF = 1231231234;
 
 struct node
 {
     int key, priority;
     node *l, *r;
-    int sz, minValue, sum;
+    int sz, sum, minValue;
 
     node(int k) : priority(rand() << 16 ^ rand()), l(NULL), r(NULL) {init(k);}
     void init(int k) {sz = 1, key = k, minValue = k, sum = k;} /*PS*/
@@ -21,54 +25,54 @@ struct node
     node* refresh() /*PS*/
     {
         init(key);
+        sz += getSz(l) + getSz(r);
         if (l)
         {
-            sz += l -> sz;
-            minValue = min(minValue, l -> minValue), sum += l -> sum; /*PS*/
+            sum += l -> sum, minValue = min(minValue, l -> minValue);
         }
         if (r)
         {
-            sz += r -> sz;
-            minValue = min(minValue, r -> minValue), sum += r -> sum; /*PS*/
+            sum += r -> sum, minValue = min(minValue, r -> minValue);
         }
         return this;
     }
+
+    static int getSz(node* &n){return n ? n -> sz : 0;}
 };
 
 struct treap //Careful!!! don't forget to call srand(time(0)) in main!
 {
-    node* root;
+    node* root = NULL;
 
-    treap()
-    {
-        root = NULL;
-    }
-
-    bool branchRight(node* curr, int v, bool t)
-    {
-        return t ? curr -> key <= v : getSize(curr -> l) <= v;
-    }
-
-    int recurseRight(node* curr, int v, bool t)
-    {
-        return t ? v : v - getSize(curr -> l) - 1;
-    }
-
-    pair <node*, node*> splitKey(node* curr, int key){return splitBy(curr, key, true);}
-    pair <node*, node*> splitIndex(node* curr, int index){return splitBy(curr, index, false);}
-
-    pair <node*, node*> splitBy(node* curr, int v, bool t)
+    pair <node*, node*> splitKey(node* curr, int key)
     {
         if (!curr) return {NULL, NULL};
         pair <node*, node*> res;
-        if (branchRight(curr, v, t))
+        if (curr -> key <= key)
         {
-            tie(curr -> r, res.second) = splitBy(curr -> r, recurseRight(curr, v, t), t);
+            tie(curr -> r, res.second) = splitKey(curr -> r, key);
             res.first = curr -> refresh();
         }
         else
         {
-            tie(res.first, curr -> l) = splitBy(curr -> l, v, t);
+            tie(res.first, curr -> l) = splitKey(curr -> l, key);
+            res.second = curr -> refresh();
+        }
+        return res;
+    }
+
+    pair <node*, node*> splitIndex(node* curr, int index)
+    {
+        if (!curr) return {NULL, NULL};
+        pair <node*, node*> res;
+        if (node::getSz(curr -> l) <= index)
+        {
+            tie(curr -> r, res.second) = splitIndex(curr -> r, index - node::getSz(curr -> l) - 1);
+            res.first = curr -> refresh();
+        }
+        else
+        {
+            tie(res.first, curr -> l) = splitIndex(curr -> l, index);
             res.second = curr -> refresh();
         }
         return res;
@@ -89,47 +93,24 @@ struct treap //Careful!!! don't forget to call srand(time(0)) in main!
         }
     }
 
-    int getSize(node* &n){return n ? n -> sz : 0;}
-
-    vector <node*> splitValue(int p)
-    {
-        vector <node*> n(3);
-        tie(n[0], n[1]) = splitKey(root, p - 1);
-        tie(n[1], n[2]) = splitKey(n[1], p);
-        return n;
-    }
-
-    vector<node*> splitRange(int l, int r) //PS: Only for range queries
-    {
-        vector <node*> n(3);
-        tie(n[0], n[1]) = splitIndex(root, l - 1);
-        tie(n[1], n[2]) = splitIndex(n[1], r - l);
-        return n;
-    }
-
-    void meldRange(vector <node*> &n)
-    {
-        root = meld(root = meld(n[0], n[1]), n[2]);
-    }
-
     void insert(int k)
     {
-        auto n = splitValue(k);
-        n[1] = new node(k);
-        meldRange(n);
+        auto a = splitKey(root, k - 1), b = splitKey(a.second, k);
+        b.first = new node(k);
+        root = meld(a.first, root = meld(b.first, b.second));
     }
 
     void erase(int k)
     {
-        auto n = splitValue(k);
-        root = meld(n[0], n[2]);
+        auto a = splitKey(root, k - 1), b = splitKey(a.second, k);
+        root = meld(a.first, b.second);
     }
 
     int query(int l, int r, bool isSumQuery) //PS: no bool if only 1 query type
     {
-        auto n = splitRange(l, r);
-        int res = isSumQuery ? n[1] -> sum : n[1] -> minValue; /*PS*/
-        meldRange(n);
+        auto a = splitIndex(root, l - 1), b = splitIndex(a.second, r - l);
+        int res = isSumQuery ? b.first -> sum : b.first -> minValue; /*PS*/
+        root = meld(a.first, root = meld(b.first, b.second));
         return res;
     }
 };
