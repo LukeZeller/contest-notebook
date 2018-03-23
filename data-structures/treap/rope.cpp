@@ -7,6 +7,7 @@
 #include <vector>
 #include <tuple>
 #include <random>
+#include <ctime>
 
 using namespace std;
 
@@ -16,13 +17,13 @@ struct node
     node *l, *r;
     bool rev; /*PS*/
 
-    node(int k) : key(k), priority(rand() << 16 ^ rand()), l(NULL), r(NULL), sz(1) {rev = false;} //PS: remove rev if reverse() not used
+    node(int k) : priority(rand() << 16 ^ rand()), l(NULL), r(NULL) {init(k), resetReverse();} //PS: remove rev if reverse() not used
+    void init(int k){sz = 1, key = k;}
 
     node* refresh()
     {
-        sz = 1;
-        if (l) sz += l -> sz;
-        if (r) sz += r -> sz;
+        init(key);
+        sz += getSz(l) + getSz(r);
         return this;
     }
 
@@ -39,25 +40,22 @@ struct node
 
     void setReverse(){rev ^= true;} /*PS*/
     void resetReverse(){rev = false;} /*PS*/
+
+    static int getSz(node* &n){return n ? n -> sz : 0;}
 };
 
-struct treap
+struct treap //Careful!!! don't forget to call srand(time(0)) in main!
 {
-    node* root;
-
-    treap()
-    {
-        root = NULL;
-    }
+    node* root = NULL;
 
     pair <node*, node*> splitIndex(node* curr, int index)
     {
         if (!curr) return {NULL, NULL};
         curr -> pushLazy(); /*PS*/
         pair <node*, node*> res;
-        if (getSize(curr -> l) <= index)
+        if (node::getSz(curr -> l) <= index)
         {
-            tie(curr -> r, res.second) = splitIndex(curr -> r, index - getSize(curr -> l) - 1);
+            tie(curr -> r, res.second) = splitIndex(curr -> r, index - node::getSz(curr -> l) - 1);
             res.first = curr -> refresh();
         }
         else
@@ -72,7 +70,7 @@ struct treap
     {
         if (a) a -> pushLazy(); /*PS*/
         if (b) b -> pushLazy(); /*PS*/
-        if (!a or !b) return a ? a: b;
+        if (!a or !b) return a ? a : b;
         if (a -> priority >= b -> priority)
         {
             a -> r = meld(a -> r, b);
@@ -85,55 +83,36 @@ struct treap
         }
     }
 
-    int getSize(node* &n){return n ? n -> sz : 0;}
-
-    vector<node*> splitRange(int l, int r) //PS: all following functions are optional
-    {
-        vector <node*> n(3);
-        tie(n[0], n[1]) = splitIndex(root, l - 1);
-        tie(n[1], n[2]) = splitIndex(n[1], r - l);
-        return n;
-    }
-
-    void meldRange(vector <node*> &n)
-    {
-        root = meld(root = meld(n[0], n[1]), n[2]);
-    }
-
-    int size(){return getSize(root);}
+    int size(){return node::getSz(root);} //PS: all following functions are independent
 
     void insert(int p, int v)
     {
-        vector <node*> n(3);
-        n[1] = new node(v);
-        tie(n[0], n[2]) = splitIndex(root, p - 1);
-        meldRange(n);
+        auto a = splitIndex(root, p - 1);
+        node* b = new node(v);
+        root = meld(a.first, root = meld(b, a.second));
     }
 
-    void erase(int l, int r) //[l, r] inclusive
+    void erase(int l, int r)
     {
-        auto n = splitRange(l, r);
-        root = meld(n[0], n[2]);
+        auto a = splitIndex(root, l - 1), b = splitIndex(a.second, r - l);
+        root = meld(a.first, b.second);
     }
 
-    void concat(treap &o)
-    {
-        root = meld(root, o.root);
-    }
+    void concat(treap &o){root = meld(root, o.root);}
 
     void reverse(int l, int r) //[l, r] inclusive
     {
-        auto n = splitRange(l, r);
-        n[1] -> setReverse();
-        meldRange(n);
+        auto a = splitIndex(root, l - 1), b = splitIndex(a.second, r - l);
+        b.first -> setReverse();
+        root = meld(a.first, root = meld(b.first, b.second));
     }
 
     vector <int> substr(int l, int len) //start at l, len chars long
     {
-        vector <int> v; //PS: can use string instead
-        auto n = splitRange(l, l + len - 1);
-        inorder(n[1], v);
-        meldRange(n);
+        auto a = splitIndex(root, l - 1), b = splitIndex(a.second, len - 1);
+        vector <int> v;
+        inorder(b.first, v);
+        root = meld(a.first, root = meld(b.first, b.second));
         return v;
     }
 
@@ -149,6 +128,8 @@ struct treap
 
 int main()
 {
+    srand(time(0));
+
     treap trp;
     string s = "hello";
     for (char c: s) trp.insert(trp.size(), c - 'a');
