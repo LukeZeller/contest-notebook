@@ -15,7 +15,7 @@ struct node /*PS*/
     void init(int i){sum = i;}
     void modify(int v){sum = v;}
 
-    node combine(node &o)
+    node combine(const node &o)
     {
         node res;
         res.sum = sum + o.sum;
@@ -90,15 +90,9 @@ struct segmentTree2D
         for (x1 += sz, x2 += sz; x1 <= x2; ++x1 >>= 1, --x2 >>= 1)
         {
             if (x1 & 1)
-            {
-                node res = query(x1, y1, y2);
-                lacc = lacc.combine(res);
-            }
+                lacc = lacc.combine(query(x1, y1, y2));
             if (!(x2 & 1))
-            {
-                node res = query(x2, y1, y2);
-                racc = res.combine(racc);
-            }
+                racc = query(x2, y1, y2).combine(racc);
         }
         return lacc.combine(racc).sum; /*PS*/
     }
