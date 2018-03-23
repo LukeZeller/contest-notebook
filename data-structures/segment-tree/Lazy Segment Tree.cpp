@@ -1,5 +1,5 @@
 /*
-* Description: lazy propagation segment tree with pointers
+* Description: lazy propagation segment tree
 * Demo: increment range update, max range query
 */
 
@@ -12,80 +12,65 @@ using namespace std;
 
 struct node
 {
-    int maxVal, lazy;
-    int lb, rb, isLazy;
-    node *l, *r;
+    int maxVal = -INF;
 
-    node() : l(NULL), r(NULL) {maxVal = -INF, resetLazy();} /*PS*/
-    node(node &a, node &b) : l(&a), r(&b) {refresh();}
     void init(int i){maxVal = i;}
-
-    node* refresh()
+    node combine(const node &a, const node &b)
     {
-        maxVal = max(l -> maxVal, r -> maxVal); /*PS*/
-        return this;
+        maxVal = max(a.maxVal, b.maxVal);
+        return *this;
+    }
+} acc;
+
+struct segmentTree
+{
+    node n;
+    int lb, rb, lazy; bool isLazy;
+    segmentTree *l, *r;
+
+    segmentTree(){}
+    segmentTree(int s, int d = 0) : segmentTree(0, s - 1, d) {} //PS: can use vector instead of d
+    segmentTree(int ql, int qr, int d) : lb(ql), rb(qr)
+    {
+        resetLazy();
+        if (lb == rb){n.init(d); return;}
+        int m = (lb + rb) >> 1;
+        l = new segmentTree(lb, m, d), r = new segmentTree(m + 1, rb, d);
+        n.combine(l -> n, r -> n);
+    }
+
+    int query(int l, int r){return queryn(l, r).maxVal;} /*PS*/
+    node queryn(int ql, int qr)
+    {
+        pushLazy();
+        if (lb > qr or rb < ql) return node(); //PS: max: -INF, min: INF, sum: 0
+        if (lb >= ql and rb <= qr) return n;
+        return acc.combine(l -> queryn(ql, qr), r -> queryn(ql, qr));
+    }
+
+    void modify(int ql, int qr, int v)
+    {
+        pushLazy();
+        if (lb > qr or rb < ql) return;
+        if (lb >= ql and rb <= qr)
+        {
+            setLazy(v), pushLazy();
+            return;
+        }
+        l -> modify(ql, qr, v), r -> modify(ql, qr, v);
+        n.combine(l -> n, r -> n);
     }
 
     void pushLazy()
     {
-        if (isLazy)
-        {
-            maxVal += lazy; /*PS*/
-            if (lb != rb)
-                l -> setLazy(lazy), r -> setLazy(lazy);
-            resetLazy();
-        }
+        if (!isLazy) return;
+        n.maxVal += lazy; /*PS*/
+        if (lb != rb) l -> setLazy(lazy), r -> setLazy(lazy);
+        resetLazy();
     }
 
     void setLazy(int v){lazy += v, isLazy = true;} /*PS*/
     void resetLazy(){lazy = 0, isLazy = false;} //PS: set lazy s.t. setLazy() on non-lazy node is valid
-};
-
-struct segmentTree
-{
-    int sz, defaultValue = 0;
-    node* root;
-
-    segmentTree(){}
-    segmentTree(int s)
-    {
-        root = new node(), sz = s;
-        build(root, 0, sz - 1);
-    }
-
-    void build(node* &curr, int l, int r)
-    {
-        curr -> lb = l, curr -> rb = r;
-        if (l == r) {curr -> init(defaultValue); return;}
-        int m = (l + r) >> 1;
-        build(curr -> l = new node(), l, m), build(curr -> r = new node(), m + 1, r);
-        curr -> refresh();
-    }
-
-    int query(int l, int r) {return query(root, l, r).maxVal;} //PS
-    node query(node* &curr, int l, int r)
-    {
-        curr -> pushLazy();
-        if (curr -> lb > r or curr -> rb < l) return node();
-        if (curr -> lb >= l and curr -> rb <= r) return *curr;
-        node lq = query(curr -> l, l, r), rq = query(curr -> r, l, r);
-        return node(lq, rq);
-    }
-
-    void modify(int l, int r, int v) {modify(root, l, r, v);}
-    void modify(node* &curr, int l, int r, int v)
-    {
-        curr -> pushLazy();
-        if (curr -> lb > r or curr -> rb < l) return;
-        if (curr -> lb >= l and curr -> rb <= r)
-        {
-            curr -> setLazy(v);
-            curr -> pushLazy();
-            return;
-        }
-        modify(curr -> l, l, r, v), modify(curr -> r, l, r, v);
-        curr -> refresh();
-    }
 };
 
 int main()
