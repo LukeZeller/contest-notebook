@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <tuple>
+#include <random>
 
 using namespace std;
 
@@ -86,7 +87,7 @@ struct treap
 
     int getSize(node* &n){return n ? n -> sz : 0;}
 
-    vector<node*> splitRange(int l, int r)
+    vector<node*> splitRange(int l, int r) //PS: all following functions are optional
     {
         vector <node*> n(3);
         tie(n[0], n[1]) = splitIndex(root, l - 1);
@@ -99,7 +100,7 @@ struct treap
         root = meld(root = meld(n[0], n[1]), n[2]);
     }
 
-    int size(){return getSize(root);} //PS: all following functions are independent/optional
+    int size(){return getSize(root);}
 
     void insert(int p, int v)
     {
@@ -175,6 +176,6 @@ int main()
     //Expected: eold
     for (int i: trp.substr(0, trp.size())) cout<<char(i + 'a');;
     cout<<'\n';
-    
+
     return 0;
 }
