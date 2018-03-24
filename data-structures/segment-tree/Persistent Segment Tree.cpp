@@ -1,6 +1,7 @@
 /*
 * Description: persistent segment tree
-* Demo: increment range update, max range query
+* Demo: increment range update, max range query, 
+  modify (in segment tree) returns root of the new tree
 */
 
 #include <iostream>
