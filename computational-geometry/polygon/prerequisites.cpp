@@ -30,8 +30,11 @@ struct pt
     ptT dist2(const pt &o) const {return (*this - o).norm2();}
 };
 
-int sgn(ptT i) {return (i > -EPS) - (i < EPS);}
-int orientation(pt &o, pt &a, pt &b) {return sgn((b - o) ^ (a - o));} //cw: 1, ccw: -1, col: 0
+int orientation(const pt &o, const pt &a, const pt &b)
+{
+    auto cp = (b - o) ^ (a - o);
+    return cp > 0 ? 1 : (cp < 0 ? -1 : 0); //PS: change > 0 to > EPS and < 0 to < -EPS for doubles
+} //cw: 1, ccw: -1, col: 0
 
 typedef vector <pt> polygon;
 int prev(int i, int n, int st = 1){return (i - st + n) % n;}
