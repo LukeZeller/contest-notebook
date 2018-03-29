@@ -1,6 +1,7 @@
 /*
 * Description: andrew monotone chain algorithm for finding convex hull
 * Demo: returns points in clockwise order, can be adjusted to also return boundary points
+* Dependency: convex polygon base
 */
 
 polygon andrewMonotoneChain(polygon &points)
