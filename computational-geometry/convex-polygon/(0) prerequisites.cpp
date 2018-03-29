@@ -33,6 +33,6 @@ struct pt
 int sgn(ptT i) {return (i > -EPS) - (i < EPS);}
 int orientation(pt &o, pt &a, pt &b) {return sgn((b - o) ^ (a - o));} //cw: 1, ccw: -1, col: 0
 
-typedef vector<pt> polygon;
+typedef vector <pt> polygon;
 int prev(int i, int n, int st = 1){return (i - st + n) % n;}
 int next(int i, int n, int st = 1){return (i + st) % n;};
