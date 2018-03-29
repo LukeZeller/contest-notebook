@@ -10,10 +10,9 @@ using namespace std;
 
 #define ll long long
 
-typedef ll ptT; //PS: otherwise long double
-
 const double EPS = 1e-9;
 
+typedef ll ptT; //PS: otherwise long double
 struct pt
 {
     ptT x, y;
