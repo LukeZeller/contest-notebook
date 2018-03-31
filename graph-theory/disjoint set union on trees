@@ -1,0 +1,78 @@
+/*
+* Description: disjoint set union on trees
+*/
+
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+struct edge{int to;};
+typedef vector <vector<edge>> graph;
+
+struct dsuOnTree
+{
+    int sz, timer = 0;
+    graph g;
+    vector <int> st, ft, ordered, sizes;
+
+    vector <int> sols;
+    //PS: other PS parameters
+
+    dsuOnTree(graph &gr)
+    {
+        g = gr, sz = g.size();
+        st.resize(sz), ft.resize(sz), ordered.resize(sz), sizes.resize(sz);
+        sols.resize(sz); //PS: Initialize PS parameters
+        tour(), dfs();
+    }
+
+    int tour(int curr = 0, int prev = -1)
+    {
+        sizes[curr] = 1;
+        ordered[timer] = curr, st[curr] = timer++;
+        for (edge e: g[curr]) if (e.to != prev)
+            sizes[curr] += tour(e.to, curr);
+        ft[curr] = timer;
+        return sizes[curr];
+    }
+
+    void add(int v)
+    {
+        //PS: modify PS parameters for when node v is added
+    }
+
+    void rmv(int v)
+    {
+       //PS: modify PS parameters for when node v is removed
+    }
+
+    void dfs(int curr = 0, int prev = -1, bool keep = false)
+    {
+        int mx = -1, heavy = -1;
+        for (edge e: g[curr]) if (e.to != prev and sizes[e.to] > mx)
+            mx = sizes[e.to], heavy = e.to;
+        for (edge e: g[curr]) if (e.to != prev and e.to != heavy)
+            dfs(e.to, curr);
+        if (heavy != -1)
+            dfs(heavy, curr, true);
+        for (edge e: g[curr]) if (e.to != prev and e.to != heavy)
+            for (int t = st[e.to]; t < ft[e.to]; t++)
+                add(ordered[t]);
+        add(curr);
+        sols[curr] = //PS: set solution for curr node using PS parameters
+        if (keep) return;
+        for (int t = st[curr]; t < ft[curr]; t++)
+            rmv(ordered[t]);
+    }
+};
+
+int main()
+{
+    graph g;
+    dsuOnTree dsu(g);
+    for (auto i: dsu.sols) cout<<i<<" ";
+    cout<<'\n';
+
+    return 0;
+}
