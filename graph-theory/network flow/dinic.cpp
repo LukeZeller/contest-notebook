@@ -5,105 +5,125 @@
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <queue>
+#include <algorithm>
 
 using namespace std;
 
-const int INF = 1231231234; //PS: needs to be 1e18 for long long flow
-const double EPS = 1e-9;
+const int INF = 1231231234;
 
-struct edge {int to, id;};
+struct edge{int to, id;};
 typedef vector<vector<edge>> graph;
 typedef int flowT; /*PS*/
 
-vector <flowT> capacities, flow;
-vector <int> level, startEdge;
-void addEdge(graph &g, int from, int to, flowT capacity)
+struct dinic
 {
-    g[from].push_back({to, (int) flow.size()});
-    capacities.push_back(capacity), flow.push_back(0);
-    g[to].push_back({from, (int) flow.size()});
-    capacities.push_back(0), flow.push_back(0);
-}
+    int sz;
+    graph g;
+    vector <flowT> capacities, flow;
+    vector <int> level, startEdge;
+    vector <bool> cut; //PS: S: true, T: false
 
-flowT residual(int id){return capacities[id] - flow[id];}
-
-bool buildLevelGraph(graph &g, int source, int sink)
-{
-    queue <int> q;
-    q.push(source);
-    fill(level.begin(), level.end(), -1);
-    level[source] = 0;
-    while (!q.empty())
+    dinic(int s)
     {
-        int curr = q.front();
-        q.pop();
-        for (edge e: g[curr]) if (level[e.to] == -1 and residual(e.id) > EPS)
-        {
-            q.push(e.to);
-            level[e.to] = level[curr] + 1;
-        }
+        sz = s, g.resize(sz);
+        level.resize(sz), startEdge.resize(sz), cut.resize(sz);
     }
-    return level[sink] != -1;
-}
 
-flowT blockingFlow(graph &g, int curr, int sink, flowT sent = INF)
-{
-    if (curr == sink) return sent;
-    for (; startEdge[curr] < g[curr].size(); startEdge[curr]++)
+    void addEdge(int from, int to, flowT capacity)
     {
-        edge e = g[curr][startEdge[curr]];
-        if (level[e.to] == level[curr] + 1 and residual(e.id) > EPS)
+        g[from].push_back({to, (int) flow.size()});
+        capacities.push_back(capacity), flow.push_back(0);
+        g[to].push_back({from, (int) flow.size()});
+        capacities.push_back(0), flow.push_back(0);
+    }
+
+    flowT residual(int id){return capacities[id] - flow[id];}
+
+    bool buildLevelGraph(int source, int sink)
+    {
+        queue <int> q;
+        q.push(source);
+        fill(level.begin(), level.end(), -1);
+        level[source] = 0;
+        while (!q.empty())
         {
-            flowT augment = blockingFlow(g, e.to, sink, min(sent, residual(e.id)));
-            if (augment > EPS)
+            int curr = q.front();
+            q.pop();
+            for (edge e: g[curr]) if (level[e.to] == -1 and residual(e.id) > 0)
             {
-                flow[e.id] += augment;
-                flow[e.id ^ 1] -= augment;
-                return augment;
+                q.push(e.to);
+                level[e.to] = level[curr] + 1;
             }
         }
+        return level[sink] != -1;
     }
-    return 0;
-}
 
-flowT dinic(graph &g, int source, int sink)
-{
-    flowT res = 0;
-    level.resize(g.size()), startEdge.resize(g.size());
-    while (buildLevelGraph(g, source, sink))
+    flowT blockingFlow(int curr, int sink, flowT sent = INF)
     {
-        fill(startEdge.begin(), startEdge.end(), 0);
-        while (flowT delta = blockingFlow(g, source, sink)) res += delta;
+        if (curr == sink) return sent;
+        for (; startEdge[curr] < g[curr].size(); startEdge[curr]++)
+        {
+            edge e = g[curr][startEdge[curr]];
+            if (level[e.to] == level[curr] + 1 and residual(e.id) > 0)
+            {
+                flowT augment = blockingFlow(e.to, sink, min(sent, residual(e.id)));
+                if (augment > 0)
+                {
+                    flow[e.id] += augment;
+                    flow[e.id ^ 1] -= augment;
+                    return augment;
+                }
+            }
+        }
+        return 0;
     }
-    return res;
-}
+
+    flowT maxflow(int source, int sink)
+    {
+        flowT res = 0;
+        while (buildLevelGraph(source, sink))
+        {
+            fill(startEdge.begin(), startEdge.end(), 0);
+            while (flowT delta = blockingFlow(source, sink)) res += delta;
+        }
+        findcut(source); //PS: only if min-cut is needed
+        return res;
+    }
+
+    void findcut(int curr) /*PS*/
+    {
+        if (cut[curr]) return;
+        cut[curr] = true;
+        for (edge e: g[curr]) if (!cut[e.to] and residual(e.id) > 0)
+            findcut(e.to);
+    }
+};
 
 int main()
 {
     int n = 5;
-    graph g(n + 2);
+    dinic dnc(n + 2);
 
     int source = n, sink = n + 1;
-    addEdge(g, source, 0, 5), addEdge(g, source, 1, 5), addEdge(g, source, 2, 3);
-    addEdge(g, 0, 3, 1), addEdge(g, 0, 4, 4), addEdge(g, 1, 4, 2), addEdge(g, 2, 4, 1);
-    addEdge(g, 3, sink, 10), addEdge(g, 4, sink, 5);
+    dnc.addEdge(source, 0, 5), dnc.addEdge(source, 1, 5), dnc.addEdge(source, 2, 3);
+    dnc.addEdge(0, 3, 1), dnc.addEdge(0, 4, 4), dnc.addEdge(1, 4, 2), dnc.addEdge(2, 4, 1);
+    dnc.addEdge(3, sink, 10), dnc.addEdge(4, sink, 5);
 
     //Expected: 6
-    cout<<dinic(g, source, sink)<<'\n';
+    cout<<dnc.maxflow(source, sink)<<'\n';
 
-    addEdge(g, 1, 0, 5);
-    fill(flow.begin(), flow.end(), 0);
+    dnc.addEdge(1, 0, 5);
+    fill(dnc.flow.begin(), dnc.flow.end(), 0);
 
     //Expected: 6
-    cout<<dinic(g, source, sink)<<'\n';
+    cout<<dnc.maxflow(source, sink)<<'\n';
 
-    addEdge(g, 0, sink, 5);
-    fill(flow.begin(), flow.end(), 0);
+    dnc.addEdge(0, sink, 5);
+    fill(dnc.flow.begin(), dnc.flow.end(), 0);
 
     //Expected: 11
-    cout<<dinic(g, source, sink)<<'\n';
+    cout<<dnc.maxflow(source, sink)<<'\n';
 
     return 0;
 }
