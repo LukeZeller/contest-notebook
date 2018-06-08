@@ -1,5 +1,5 @@
 /*
-* Description: convex polygon base code
+* Description: vector operations
 */
 
 #include <iostream>
