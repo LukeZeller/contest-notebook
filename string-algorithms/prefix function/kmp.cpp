@@ -10,9 +10,6 @@ using namespace std;
 
 const int alpha = 26;
 
-struct edge{int to; string str;};
-typedef vector <vector<edge>> graph;
-
 vector <int> prefixFunction(string &s)
 {
     vector <int> pf(s.length());
