@@ -20,6 +20,7 @@ struct pt
     bool operator < (const pt &o) const {return make_pair(y, x) < make_pair(o.y, o.x);}
     bool operator == (const pt &o) const {return abs(x - o.x) < EPS and abs(y - o.y) < EPS;}
 
+    pt operator + (const pt &o) const {return {x + o.x, y + o.y};}
     pt operator - (const pt &o) const {return {x - o.x, y - o.y};}
 
     ptT operator ^ (const pt &o) const {return x * o.y - y * o.x;}
