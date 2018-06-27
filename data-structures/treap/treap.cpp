@@ -113,6 +113,14 @@ struct treap //Careful!!! don't forget to call srand(time(0)) in main!
         root = meld(a.first, root = meld(b.first, b.second));
         return res;
     }
+    
+    int findIndex(int k) //returns -1 if k not in treap
+    {
+        auto a = splitKey(root, k - 1), b = splitKey(a.second, k);
+        int res = node::getSz(b.first) > 0 ? node::getSz(a.first) : -1;
+        root = meld(a.first, root = meld(b.first, b.second));
+        return res;
+    }
 };
 
 int main()
