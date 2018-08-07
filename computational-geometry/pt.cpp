@@ -25,12 +25,16 @@ struct pt
 
     ptT operator ^ (const pt &o) const {return x * o.y - y * o.x;}
     ptT operator * (const pt &o) const {return x * o.x + y * o.y;}
-
+    
+    pt rotateCw(double theta) {return {cos(theta) * x + sin(theta) * y, - sin(theta) * x + cos(theta) * y};}
+    pt rotateCcw(double theta) {return {cos(theta) * x - sin(theta) * y, sin(theta) * x + cos(theta) * y};}
+    
     ptT norm2() const {return *this * *this;}
     ptT dist2(const pt &o) const {return (*this - o).norm2();}
 };
 pt operator * (ptT k, const pt &p) {return {k * p.x, k * p.y};}
 pt operator * (const pt &p, ptT k){return {k * p.x, k * p.y};}
+pt operator / (const pt &p, ptT k){return {p.x / k, p.y / k};}
 
 int orientation(const pt &o, const pt &a, const pt &b)
 {
