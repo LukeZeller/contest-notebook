@@ -1,9 +1,8 @@
 /*
 * Description: finding tangents of convex polygon
 * Demo: findTangentsConvexPoly returns pair of indices of tangent points (returns (-1, -1) if point is on/in polygon)
-*       addPointConvexPolygonArea returns doubled oriented area of polygon if p was added
-*       addPointConvexPolygon returns convex polygon if p was added (Runtime: O(N))
-* Dependency: polygon prereqs, andrew monotone chain, convex polygon inclusion [shoelace theorem, vertex shifting for addPoint... functions]
+        addPointConvexPolygonArea returns the area of the polygon after point p is inserted (requires shoelaces to be passed in)
+* Dependency: convex polygon inclusion
 */
 
 pair <int, int> findTangentsConvexPolygon(polygon &poly, pt p)
@@ -48,49 +47,16 @@ ptT addPointConvexPolygonArea(polygon &poly, vector <ptT> &shoelace, pt &p)
     else return shoelace[lt] - shoelace[rt] + newArea;
 }
 
-polygon addPointConvexPolygon(polygon &poly, pt &p)
-{
-    auto tangents = findTangentsConvexPolygon(poly, p);
-    int lt = tangents.first, rt = tangents.second;
-    if (lt == -1 and rt == -1) return poly;
-    polygon res;
-    if (lt < rt)
-    {
-        res.push_back(p);
-        for (int i = rt; i < poly.size(); i++) res.push_back(poly[i]);
-        for (int i = 0; i <= lt; i++) res.push_back(poly[i]);
-    }
-    else
-    {
-        res.push_back(p);
-        for (int i = rt; i <= lt; i++) res.push_back(poly[i]);
-    }
-    return rotateVertices(res);
-}
-
 int main()
 {
     polygon poly = {{0, 0}, {0, 10}, {10, 20}, {20, 10}, {10, 0}};
     auto shoelace = getShoelaces(poly);
 
     vector <pt> add = {{20, 20}, {10, 10}, {-10, -10}, {-10, 10}, {55, -5}};
-    /*Expected:
-    * (0, 0) (0, 10) (10, 20) (20, 20) (20, 10) (10, 0)
-    * 300 300
-    * (0, 0) (0, 10) (10, 20) (20, 10) (10, 0)
-    * 250 250
-    * (-10, -10) (0, 10) (10, 20) (20, 10) (10, 0)
-    * 350 350
-    * (0, 0) (-10, 10) (10, 20) (20, 10) (10, 0)
-    * 350 350
-    * (55, -5) (0, 0) (0, 10) (10, 20)
-    * 625 625
-    */
+    // Expected: 300 250 350 350 625
     for (int i = 0; i < add.size(); i++)
     {
-        auto modified = addPointConvexPolygon(poly, add[i]);
-        for (pt p: modified) cout<<"("<<p.x<<", "<<p.y<<") "; cout<<'\n';
-        cout<<abs(addPointConvexPolygonArea(poly, shoelace, add[i]) / 2.0) <<" "<<abs(polygonArea(modified) / 2.0)<<'\n';
+        cout<<abs(addPointConvexPolygonArea(poly, shoelace, add[i]) / 2.0)<<'\n';
     }
 
     return 0;
