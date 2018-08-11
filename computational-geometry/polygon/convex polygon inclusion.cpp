@@ -1,9 +1,8 @@
 /*
-* Description: convex polygon containment
+* Description: convex polygon inclusion
 * Demo: pointInTriangle returns if point is in/on/out of triangle
 *        pointInConvexPolygon returns pair where first is in/on/out value and
 *        triangle (poly[0], poly[second - 1], poly[second]) contains point
-* Dependency: convex polygon base
 */
 
 int pointInTriangle(polygon &triangle, pt &p)
