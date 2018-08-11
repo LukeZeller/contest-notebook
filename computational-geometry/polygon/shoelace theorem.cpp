@@ -9,13 +9,18 @@ vector <ptT> getShoelaces(polygon &poly)
     int sz = poly.size();
     vector <ptT> shoelace(sz + 1);
     for (int i = 0; i < sz; i++)
-    {
         shoelace[i + 1] = shoelace[i] + (poly[i] ^ poly[next(i, sz)]); //Caution !! returns doubled/oriented area -> cw: negative
-    }
     return shoelace;
 }
 
-ptT polygonArea(polygon &poly){return getShoelaces(poly)[poly.size()];}
+ptT polygonArea(polygon &poly)
+{
+    int sz = poly.size();
+    ptT sol = 0;
+    for (int i = 0; i < sz; i++)
+        sol += poly[i] ^ poly[next(i, sz)]; //Caution !! returns doubled/oriented area -> cw: negative
+    return sol;
+}
 
 int main()
 {
