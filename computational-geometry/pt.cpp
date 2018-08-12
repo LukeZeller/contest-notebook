@@ -2,13 +2,6 @@
 * Description: vector operations
 */
 
-#include <iostream>
-#include <vector>
-#include <cmath>
-
-using namespace std;
-
-typedef long long ll;
 const double EPS = 1e-9;
 
 typedef long double ptT; //PS: otherwise long long
