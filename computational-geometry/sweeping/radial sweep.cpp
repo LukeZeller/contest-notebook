@@ -42,3 +42,18 @@ vector <pt> sortByAngleLine(vector <pt> points, const pt &origin) // Caution!! R
         p = p.reflect(origin);
     return points;
 }
+
+int main()
+{
+    vector <pt> points = {{30, 30}, {60, 30}, {100, 20}, {70, 40}, {110, 40}, {40, 50}, {80, 70}};
+    auto res1 = sortByAngleRay(points, {70, 40});
+
+    //Expected: (70, 40), (40, 50), (80, 70), (110, 40), (100, 20), (60, 30), (30, 30)
+    for (pt p: res1) cout<<"("<<p.x<<", "<<p.y<<") ";
+    cout<<'\n';
+
+    auto res2 = sortByAngleLine(points, {70, 40});
+    //Expected: (70, 40), (110, 40), (40, 50), (100, 20), (80, 70), (60, 30), (30, 30)
+    for (pt p: res2) cout<<"("<<p.x<<", "<<p.y<<") ";
+    cout<<'\n';
+}
