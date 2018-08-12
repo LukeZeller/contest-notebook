@@ -25,24 +25,3 @@ pair <int, int> pointInConvexPolygon(polygon &poly, pt &p)
     polygon triangle = {poly[pos - 1], poly[pos], poly[0]};
     return {pointInTriangle(triangle, p), pos};
 } //inside: -1, outside: 1, on: 0
-
-int main()
-{
-    polygon poly = {{6, -1}, {0, 0}, {0, 5}, {3, 8}, {5, 5}};
-    vector <pt> check = {{6, -2}, {6, 3}, {1, 7}, {3, 3}, {0, 3}};
-
-    //Expected: (0, 2), (0, 2), (0, 3), (0, 4), (0, 4)
-    for (pt p: poly)
-    {
-        auto res = pointInConvexPolygon(poly, p);
-        cout<<"("<<res.first<<", "<<res.second<<") ";
-    }
-    cout<<'\n';
-    //Expected: (1, 1), (1, 5), (1, 3), (-1, 3), (0, 2)
-    for (pt p: check)
-    {
-        auto res = pointInConvexPolygon(poly, p);
-        cout<<"("<<res.first<<", "<<res.second<<") ";
-    }
-    cout<<'\n';
-}
