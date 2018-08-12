@@ -1,7 +1,7 @@
 /*
 * Description: shoelace theorem for finding simple polygon area
 * Demo: shoelaces are doubled oriented area (negative for cw)
-* Dependency: convex polygon base
+* Dependency: pt class
 */
 
 vector <ptT> getShoelaces(polygon &poly)
