@@ -22,14 +22,3 @@ polygon andrewMonotoneChain(polygon &points)
     if (hull.size() == 2 and hull[0] == hull[1]) hull.pop_back();
     return hull;
 }
-
-int main()
-{
-    polygon poly = {{10, 20}, {0, 0}, {10, 0}, {20, 10}, {0, 10}, {5, 5}};
-    auto hull = andrewMonotoneChain(poly);
-
-    //Expected: (0, 0) (0, 10) (10, 20) (20, 10) (10, 0)
-    for (pt p: hull) cout<<"("<<p.x<<", "<<p.y<<") "; cout<<'\n';
-
-    return 0;
-}
