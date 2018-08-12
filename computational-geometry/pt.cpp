@@ -4,15 +4,14 @@
 
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <cmath>
 
 using namespace std;
 
-#define ll long long
-
+typedef long long ll;
 const double EPS = 1e-9;
 
-typedef ll ptT; //PS: otherwise long double
+typedef long double ptT; //PS: otherwise long long
 struct pt
 {
     ptT x, y;
@@ -22,24 +21,34 @@ struct pt
 
     pt operator + (const pt &o) const {return {x + o.x, y + o.y};}
     pt operator - (const pt &o) const {return {x - o.x, y - o.y};}
+    pt operator * (ptT k) const {return {k * x, k * y};}
+    pt operator / (ptT k) const {return {x / k, y / k};}
 
     ptT operator ^ (const pt &o) const {return x * o.y - y * o.x;}
     ptT operator * (const pt &o) const {return x * o.x + y * o.y;}
-    
-    pt rotateCw(double theta) {return {cos(theta) * x + sin(theta) * y, - sin(theta) * x + cos(theta) * y};}
-    pt rotateCcw(double theta) {return {cos(theta) * x - sin(theta) * y, sin(theta) * x + cos(theta) * y};}
-    
+
+    pt rotateCw(double theta) {return {cos(theta) * x + sin(theta) * y, - sin(theta) * x + cos(theta) * y};} // Caution!! Only use with doubles
+    pt rotateCcw(double theta) {return {cos(theta) * x - sin(theta) * y, sin(theta) * x + cos(theta) * y};} // Same as above
+    pt perpCcw() const {return {-y, x};}
+    pt perpCw() const {return {y, -x};}
+
     ptT norm2() const {return *this * *this;}
     ptT dist2(const pt &o) const {return (*this - o).norm2();}
+    pt normalize() const {return *this / sqrt(norm2());} // Caution!! Only use with doubles
 };
-pt operator * (ptT k, const pt &p) {return {k * p.x, k * p.y};}
-pt operator * (const pt &p, ptT k){return {k * p.x, k * p.y};}
-pt operator / (const pt &p, ptT k){return {p.x / k, p.y / k};}
+pt operator * (ptT k, const pt &p){return {k * p.x, k * p.y};}
 
+std::istream& operator >> (istream& is, pt &p) {return is >> p.x >> p.y;}
+std::ostream& operator << (ostream& os, const pt &p) {return os << p.x << " " << p.y;}
+
+double angleCcw(const pt &a, const pt &b){return atan2(a ^ b, a * b);}
+double angleCcw(const pt &o, const pt &a, const pt &b){return angleCcw(a - o, b - o);}
+
+ptT triArea(const pt &o, const pt &a, const pt &b){return (b - o) ^ (a - o);}
 int orientation(const pt &o, const pt &a, const pt &b)
 {
-    auto cp = (b - o) ^ (a - o);
-    return cp > 0 ? 1 : (cp < 0 ? -1 : 0); //PS: change > 0 to > EPS and < 0 to < -EPS for doubles
+    ptT cp = (b - o) ^ (a - o);
+    return cp > EPS ? 1 : (cp < -EPS ? -1 : 0); //PS: change between > 0 or > EPS and < 0 or < -EPS for ints/doubles
 } //cw: 1, ccw: -1, col: 0
 
 typedef vector <pt> polygon;
