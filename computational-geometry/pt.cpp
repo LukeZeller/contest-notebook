@@ -28,6 +28,8 @@ struct pt
     ptT norm2() const {return *this * *this;}
     ptT dist2(const pt &o) const {return (*this - o).norm2();}
     pt normalize() const {return *this / sqrt(norm2());} // Caution!! Only use with doubles
+    
+    pt reflect(const pt &o) const {return o + o - *this;}
 };
 pt operator * (ptT k, const pt &p){return {k * p.x, k * p.y};}
 
