@@ -126,6 +126,4 @@ int main()
         for (int j: bcc.components[i]) cout<<j<<" ";
         cout<<'\n';
     }
-
-    return 0;
 }
