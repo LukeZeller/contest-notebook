@@ -1,16 +1,11 @@
 /*
 * Description: tarjan's algorithm for biconnected components
-* Demo: cutVertex/bridge store cut vertices and bridges, components stores edge biconnected components
+* Demo: cutVertex/bridge store cut vertices and bridges, components stores edge biconnected components, category[i] is component # for node i
+        br[i] is true iff edge i is a bridge, cv[i] is true iff vertex i is a cut vertex
 */
-
-#include <iostream>
-#include <vector>
-
-using namespace std;
 
 struct edge{int to, id;};
 typedef vector<vector<edge>> graph;
-typedef vector<pair<int, int>> edgelist; /*PS*/
 
 struct tarjanBCC
 {
@@ -18,13 +13,13 @@ struct tarjanBCC
     graph g;
     vector <int> depths, lowlinks, cutVertex, bridge; /*PS*/
     vector <bool> cv, br; /*PS*/
-    vector <vector<int>> components; /*PS*/
+    vector <vector<int>> components; vector <int> category; /*PS*/
 
     tarjanBCC(graph &gr)
     {
         g = gr, n = g.size(), getEdge();
         depths.resize(n, -1), lowlinks.resize(n);
-        cv.resize(n), br.resize(m), components.resize(n); /*PS*/
+        cv.resize(n), br.resize(m), components.resize(n), category.resize(n); /*PS*/
         getBcc();
     }
 
@@ -73,17 +68,18 @@ struct tarjanBCC
     {
         if (depths[curr] == -1) return;
         depths[curr] = -1;
-        components[sz].push_back(curr);
+        components[sz].push_back(curr), category[curr] = sz;
         for (edge e: g[curr]) if (depths[e.to] != -1 and !br[e.id])
             categorize(e.to);
     }
 };
 
-void addEdge(graph &g, edgelist &el, int i, int j, int id)
+vector <pair<int, int>> edgeList;
+void addEdge(graph &g, int i, int j, int id)
 {
     g[i].push_back({j, id});
     g[j].push_back({i, id});
-    el.push_back({i, j});
+    edgeList.push_back({i, j});
 }
 
 int main()
@@ -91,11 +87,10 @@ int main()
     int n = 9;
 
     graph g(n);
-    edgelist el;
-    addEdge(g, el, 0, 2, 0), addEdge(g, el, 2, 4, 1), addEdge(g, el, 0, 4, 2);
-    addEdge(g, el, 1, 3, 3), addEdge(g, el, 3, 5, 4), addEdge(g, el, 5, 1, 5);
-    addEdge(g, el, 6, 8, 6), addEdge(g, el, 6, 7, 7), addEdge(g, el, 7, 8, 8);
-    addEdge(g, el, 2, 5, 9), addEdge(g, el, 5, 7, 10);
+    addEdge(g, 0, 2, 0), addEdge(g, 2, 4, 1), addEdge(g, 0, 4, 2);
+    addEdge(g, 1, 3, 3), addEdge(g, 3, 5, 4), addEdge(g, 5, 1, 5);
+    addEdge(g, 6, 8, 6), addEdge(g, 6, 7, 7), addEdge(g, 7, 8, 8);
+    addEdge(g, 2, 5, 9), addEdge(g, 5, 7, 10);
 
     auto bcc = tarjanBCC(g);
 
@@ -104,22 +99,21 @@ int main()
     cout<<'\n';
 
     //Expected: (2, 5) (5, 7)
-    for (int j: bcc.bridge) cout<<"("<<el[j].first<<", "<<el[j].second<<") ";
+    for (int j: bcc.bridge) cout<<"("<<edgeList[j].first<<", "<<edgeList[j].second<<") ";
     cout<<'\n';
 
     /*Expected:
     * 0 2 4
     * 1 3 5
-    * 5 7 8
+    * 6 7 8
     */
-
     for (int i = 0; i < bcc.sz; i++)
     {
         for (int j: bcc.components[i]) cout<<j<<" ";
         cout<<'\n';
     }
 
-    addEdge(g, el, 2, 7, 11);
+    addEdge(g, 2, 7, 11);
     bcc = tarjanBCC(g);
 
     //Expected: 2 5 7
