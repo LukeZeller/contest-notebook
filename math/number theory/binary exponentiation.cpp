@@ -1,12 +1,6 @@
 /*
-* Description: binary exponentiation and prime modular inverse
+* Description: binary exponentiation
 */
-
-#include <iostream>
-
-using namespace std;
-
-#define ll long long
 
 int mult(int a, int b, int mod)
 {
@@ -24,19 +18,8 @@ int binaryPower(int n, int p, int mod)
     return acc;
 }
 
-int pmodularInverse(int n, int pmod)
-{
-    return binaryPower(n, pmod - 2, pmod);
-}
-
 int main()
 {
-    //Expected: 2
-    cout<<pmodularInverse(5, 3)<<'\n';
-
-    //Expected: 4
-    cout<<pmodularInverse(3, 11)<<'\n';
-
     //Expected: 9765625
     cout<<binaryPower(5, 10, 1000000000)<<'\n';
 
