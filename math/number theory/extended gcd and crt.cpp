@@ -38,6 +38,14 @@ congruence chinese_remainder_theorem(congruence a, congruence b)
     return {res < 0 ? res + mod : res, mod};
 }
 
+congruence chinese_remainder_theorem(vector <congruence> &v)
+{
+    congruence res = v[0];
+    for (int i = 1; i < v.size(); i++)
+        res = chinese_remainder_theorem(res, v[i]);
+    return res;
+}
+
 int main()
 {
     int v = 10010;
