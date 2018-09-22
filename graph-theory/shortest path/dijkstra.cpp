@@ -3,14 +3,6 @@
 * Demo: returns vector of distances from source to all nodes in graph
 */
 
-#include <iostream>
-#include <vector>
-#include <queue>
-
-using namespace std;
-
-#define ll long long
-
 const ll INF = 1e18;
 
 struct edge {int to, w;}; /*PS*/
@@ -20,18 +12,16 @@ struct node
 {
     int index; ll distance; /*PS*/
 
-    bool operator < (const node &o) const
+    bool operator > (const node &o) const
     {
-        return make_pair(distance, index) < make_pair(o.distance, o.index);
+        return make_pair(distance, index) > make_pair(o.distance, o.index);
     }
-
-    bool operator > (const node &o) const {return o < *this;}
 };
 
-vector <ll> dijkstra(graph &g, int s) /*PS*/
+vector <ll> dijkstra(graph &g, int s)
 {
     priority_queue <node, vector<node>, greater<node>> pq;
-    vector <ll> distances(g.size(), INF); /*PS*/
+    vector <ll> distances(g.size(), INF); 
     vector <bool> visited(g.size());
 
     pq.push({s, 0});
@@ -53,7 +43,7 @@ vector <ll> dijkstra(graph &g, int s) /*PS*/
     return distances;
 }
 
-void addEdge(graph &g, int i, int j, int w) /*PS*/
+void addEdge(graph &g, int i, int j, int w)
 {
     g[i].push_back({j, w});
     g[j].push_back({i, w});
