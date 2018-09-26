@@ -8,7 +8,7 @@ struct equation
     ll a, b; // y = a * x + b
 
     ll y(ll x0){return a * x0 + b;}
-    long double intersect(equation o){return (long double) (o.b - b) / (a - o.a);}
+    long double intersect(equation o){return (long double) (o.b - b) / (a - o.a);} //PS: this assumes two equations never have same slope, can just return INF if they do
 };
 
 // Requires monotone decreasing slope
