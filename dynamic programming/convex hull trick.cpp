@@ -1,5 +1,5 @@
 /*
-* Description: convex hull trick for finding max/min
+* Description: convex hull trick for finding min
 * Demo: static cht (queries only increasing) and dynamic cht (arbitrary queries) to find min using set of linear functions at given x-value
 *       Assumes that slopes of lines placed into convex hull are monotone decreasing
 */
