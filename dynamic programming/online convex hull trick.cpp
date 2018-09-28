@@ -3,82 +3,74 @@
 * Demo: dynamic cht (arbitrary queries and insertions) to find min using set of linear functions at given x-value
 */
 
+bool chtQuery;
 struct equation
 {
-    ll a, b; // y = a * x + b
+    mutable ll a, b; // y = a * x + b
+    mutable long double intersectNxt = 0;
 
+    ll slope() const {return a;}
+    ll constant() const {return b;}
     ll y(ll x0) const {return a * x0 + b;}
-    long double intersect(equation o) const {return (long double) (o.b - b) / (a - o.a);} // PS: this assumes two equations never have same slope, can just return INF if they do
 
-    bool operator < (const equation &o) const // PS: sort by slope (faster growing equation comes first)
+    double intersect(equation o) const {return (long double) (o.b - b) / (a - o.a);}
+    bool operator < (const equation &o) const // sort by slope if insert, sort by intersection if query
     {
-        return a > o.a;
+        return chtQuery ? intersectNxt < o.intersectNxt : slope() > o.slope(); // PS: change to slope() < o.slope() for max queries
     }
 };
 
-// negate y() and both sides of slope comparator in equation to get maximum
-struct convexHullTrick
+struct convexHullTrick : multiset<equation>
 {
-    vector <vector <equation>> hulls;
-
-    void addEquation(const equation &e)
+    const ll oo = numeric_limits<ll>::max() - 5;
+    bool setNext(iterator x, iterator y) // returns true if x makes y redundant
     {
-        vector <equation> carry = {e};
-        for (int i = 0; ; i++)
+        if (y == end())
         {
-            if (i >= hulls.size())
-                hulls.emplace_back();
+            x -> intersectNxt = oo;
+            return false;
+        }
+        if (x -> slope() == y -> slope())
+            x -> intersectNxt = x -> constant() > y -> constant() ? oo : -oo;
+        else
+            x -> intersectNxt = x -> intersect(*y);
+        return x -> intersectNxt >= y -> intersectNxt;
+    }
 
-            if (hulls[i].empty())
-            {
-                hulls[i] = move(carry);
-                break;
-            }
+    void addEquation(equation e)
+    {
+        auto it = insert(e);
+        if (setNext(it, next(it)))
+        {
+            erase(it);
+            return;
+        }
+        if (it == begin())
+            return;
+
+        setNext(prev(it), it);
+
+        auto pit = prev(it);
+        while (pit != begin())
+        {
+            it = pit, pit = prev(pit);
+            if (pit -> intersectNxt >= it -> intersectNxt)
+                setNext(pit, erase(it));
             else
-                mergeHulls(carry, hulls[i]);
+                break;
         }
     }
 
     ll getMin(ll x0)
     {
-        bool nonEmpty = false;
-        ll res = INF;
-        for (const auto &hull: hulls) if (!hull.empty())
-            res = min(res, getMinDynamic(hull, x0)), nonEmpty = true;
-        return nonEmpty ? res : 0; // PS: return value if there are no equations (currently returns 0)
-    }
+        if (empty())
+            return 0; // PS: return value if there are no equations
 
-    ll getMinDynamic(const vector <equation> &hull, ll x0)
-    {
-        if (hull.empty())
-            return numeric_limits<ll>::max();
+        chtQuery = true;
+        auto l = *lower_bound({0, 0, x0});
+        chtQuery = false;
 
-        int l = 0, r = hull.size() - 1;
-        while (l < r)
-        {
-            int m = (l + r) / 2;
-            if (hull[m].intersect(hull[m + 1]) >= x0)
-                r = m;
-            else
-                l = m + 1;
-        }
-        return hull[l].y(x0);
-    }
-
-    static void mergeHulls(vector <equation> &a, vector <equation> &b) // a = a union b, b = empty after call
-    {
-        a.insert(a.end(), b.begin(), b.end());
-        sort(a.begin(), a.end());
-
-        deque <equation> temp;
-        for (equation e: a)
-        {
-            while (temp.size() > 1 and temp.rbegin()[1].intersect(e) < temp.rbegin()[1].intersect(temp.rbegin()[0]))
-                temp.pop_back();
-            temp.push_back(e);
-        }
-        a.clear(), b.clear();
-        a.insert(a.end(), temp.begin(), temp.end());
+        return l.y(x0);
     }
 };
 
