@@ -1,28 +1,29 @@
 /*
-* Description: online convex hull trick for finding min
-* Demo: dynamic cht (arbitrary queries and insertions) to find min using set of linear functions at given x-value
+* Description: online convex hull trick for finding max
+* Demo: dynamic cht (arbitrary queries and insertions) to find max using set of linear functions at given x-value
 */
 
 bool chtQuery;
 struct equation
 {
-    mutable ll a, b; // y = a * x + b
+    mutable ll a, b; // PS: y = a * x + b
     mutable long double intersectNxt = 0;
 
-    ll slope() const {return a;}
-    ll constant() const {return b;}
-    ll y(ll x0) const {return a * x0 + b;}
+    ll slope() const {return a;} /*PS*/
+    ll constant() const {return b;} /*PS*/
+    ll y(ll x0) const {return a * x0 + b;} /*PS*/
+    ld intersect(equation o) const {return ld (o.b - b) / (a - o.a);} /*PS*/
 
-    double intersect(equation o) const {return (long double) (o.b - b) / (a - o.a);}
     bool operator < (const equation &o) const // sort by slope if insert, sort by intersection if query
     {
-        return chtQuery ? intersectNxt < o.intersectNxt : slope() > o.slope(); // PS: change to slope() < o.slope() for max queries
+        return chtQuery ? intersectNxt < o.intersectNxt : slope() < o.slope();
     }
 };
 
+// PS: Negate coefficients of equations to get min queries
 struct convexHullTrick : multiset<equation>
 {
-    const ll oo = numeric_limits<ll>::max() - 5;
+    static const ll oo = numeric_limits<ll>::max() - 5;
     bool setNext(iterator x, iterator y) // returns true if x makes y redundant
     {
         if (y == end())
@@ -39,29 +40,30 @@ struct convexHullTrick : multiset<equation>
 
     void addEquation(equation e)
     {
-        auto it = insert(e);
-        if (setNext(it, next(it)))
-        {
-            erase(it);
-            return;
-        }
+        e.intersectNxt = 0;
+        auto it = insert(e), nit = next(it);
+
+        while (setNext(it, nit))
+            nit = erase(nit);
+
         if (it == begin())
             return;
 
-        setNext(prev(it), it);
+        auto pit = it;
+        if (setNext(--pit, it))
+            setNext(pit, it = erase(it));
 
-        auto pit = prev(it);
         while (pit != begin())
         {
-            it = pit, pit = prev(pit);
-            if (pit -> intersectNxt >= it -> intersectNxt)
+            it = pit;
+            pit = prev(pit);
+            if (it != begin() and pit -> intersectNxt >= it -> intersectNxt)
                 setNext(pit, erase(it));
-            else
-                break;
+            else break;
         }
     }
 
-    ll getMin(ll x0)
+    ll getMax(ll x0)
     {
         if (empty())
             return 0; // PS: return value if there are no equations
@@ -77,8 +79,8 @@ struct convexHullTrick : multiset<equation>
 int main()
 {
     convexHullTrick cht;
-    cht.addEquation({3, 2}), cht.addEquation({1, 6}), cht.addEquation({0, 7});
+    cht.addEquation({-3, -2}), cht.addEquation({-1, -6}), cht.addEquation({-0, -7});
     //Expected: 2 5 7 7 7
-    for (int i = 0; i < 5; i++) cout<<cht.getMin(i)<<" ";
+    for (int i = 0; i < 5; i++) cout<<-cht.getMax(i)<<" ";
     cout<<'\n';
 }
