@@ -4,21 +4,21 @@
 * Dependency: pt class
 */
 
-vector <ptT> getShoelaces(polygon &poly)
+vector <ptT> getShoelaces(polygon &poly) //Caution !! returns doubled/oriented area -> cw: negative, ccw: positive
 {
     int sz = poly.size();
     vector <ptT> shoelace(sz + 1);
     for (int i = 0; i < sz; i++)
-        shoelace[i + 1] = shoelace[i] + (poly[i] ^ poly[next(i, sz)]); //Caution !! returns doubled/oriented area -> cw: negative
+        shoelace[i + 1] = shoelace[i] + (poly[i] ^ poly[next(i, sz)]); 
     return shoelace;
 }
 
-ptT polygonArea(polygon &poly)
+ptT polygonArea(polygon &poly) //Caution !! returns doubled/oriented area -> cw: negative, ccw: positive
 {
     int sz = poly.size();
     ptT sol = 0;
     for (int i = 0; i < sz; i++)
-        sol += poly[i] ^ poly[next(i, sz)]; //Caution !! returns doubled/oriented area -> cw: negative
+        sol += poly[i] ^ poly[next(i, sz)]; 
     return sol;
 }
 
