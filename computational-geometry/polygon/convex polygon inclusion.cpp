@@ -15,6 +15,7 @@ int pointInTriangle(polygon &triangle, pt &p)
     return 0;
 } //inside: -1, outside: 1, on: 0
 
+// Assumes vertices of poly are in clockwise order
 pair <int, int> pointInConvexPolygon(polygon &poly, pt &p)
 {
     if (poly[0] == p) return {0, 2};
