@@ -5,6 +5,7 @@
 * Dependency: convex polygon inclusion
 */
 
+// Assumes vertices of poly are given in clockwise orientation
 pair <int, int> findTangentsConvexPolygon(polygon &poly, pt p)
 {
     int sz = poly.size();
