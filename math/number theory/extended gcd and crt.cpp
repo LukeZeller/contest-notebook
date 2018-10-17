@@ -8,7 +8,7 @@ struct bezout_coefficients
     ll g, x, y; // x * a + y * b = gcd(a, b)
 };
 
-bezout_coefficients extended_gcd(ll a, ll b)
+bezout_coefficients extended_gcd(ll a, ll b) // x = A[1] stores modular inverse of a in mod b (assuming gcd(a, b) = 1)
 {
     array <ll, 3> A = {0, 1, a}, B = {1, 0, b};
     while (B[2] != 0)
