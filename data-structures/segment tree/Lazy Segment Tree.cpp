@@ -12,7 +12,7 @@ using namespace std;
 
 struct node /*PS*/
 {
-    int maxVal = -INF;
+    int maxVal = -INF; //PS: max: -INF, min: INF, sum: 0
 
     void init(int i){maxVal = i;}
     node combine(const node &a, const node &b)
@@ -43,7 +43,7 @@ struct segmentTree
     node queryn(int ql, int qr)
     {
         pushLazy();
-        if (lb > qr or rb < ql) return node(); //PS: max: -INF, min: INF, sum: 0
+        if (lb > qr or rb < ql) return node();
         if (lb >= ql and rb <= qr) return n;
         return acc.combine(l -> queryn(ql, qr), r -> queryn(ql, qr));
     }
