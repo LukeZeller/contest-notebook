@@ -10,7 +10,7 @@ using namespace std;
 
 #define INF 1231231234
 
-struct node
+struct node /*PS*/
 {
     int maxVal = -INF;
 
