@@ -3,12 +3,6 @@
 * Demo: exists() checks if s is in trie, numPrefixes() gives number of distinct prefixes of s in trie
 */
 
-#include <iostream>
-#include <vector>
-#include <cstring>
-
-using namespace std;
-
 const int alpha = 26; /*PS*/
 const int MAXN = 3e6; /*PS*/
 
@@ -32,9 +26,9 @@ struct trie
     vector <node> elements;
     int numNodes;
 
-    trie() //PS: requires MAXN (max number of nodes in trie)
+    trie()
     {
-        elements.resize(MAXN);
+        elements.resize(1);
         numNodes = 1;
     }
 
@@ -47,7 +41,7 @@ struct trie
         for (char c: s)
         {
             int mc = mapping(c);
-            if (next(curr, mc) == -1) next(curr, mc) = numNodes++;
+            if (next(curr, mc) == -1) elements.emplace_back(), next(curr, mc) = numNodes++;
             counts(curr, mc)++;
             curr = next(curr, mc);
         }
@@ -97,7 +91,6 @@ struct trie
 int main()
 {
     trie tr;
-
     tr.addString("hello"), tr.addString("hey"), tr.addString("he"), tr.addString("he");
     //Expected: 0 0 1
     cout<<tr.exists("heyo")<<" "<<tr.exists("h")<<" "<<tr.exists("hey")<<'\n';
@@ -109,6 +102,4 @@ int main()
     tr.removeString("he");
     //Expected: 1
     cout<<tr.numPrefixes("helloworld")<<'\n';
-
-    return 0;
 }
