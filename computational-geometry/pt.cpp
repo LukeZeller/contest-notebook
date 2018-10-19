@@ -2,7 +2,7 @@
 * Description: vector operations
 */
 
-const double EPS = 1e-9;
+const long double EPS = 1e-9;
 
 typedef long double ptT; //PS: otherwise long long
 struct pt
@@ -20,8 +20,8 @@ struct pt
     ptT operator ^ (const pt &o) const {return x * o.y - y * o.x;}
     ptT operator * (const pt &o) const {return x * o.x + y * o.y;}
 
-    pt rotateCw(double theta) {return {cos(theta) * x + sin(theta) * y, - sin(theta) * x + cos(theta) * y};} // Caution!! Only use with doubles
-    pt rotateCcw(double theta) {return {cos(theta) * x - sin(theta) * y, sin(theta) * x + cos(theta) * y};} // Same as above
+    pt rotateCw(long double theta) {return {cos(theta) * x + sin(theta) * y, - sin(theta) * x + cos(theta) * y};} // Caution!! Only use with doubles
+    pt rotateCcw(long double theta) {return {cos(theta) * x - sin(theta) * y, sin(theta) * x + cos(theta) * y};} // Same as above
     pt perpCcw() const {return {-y, x};}
     pt perpCw() const {return {y, -x};}
 
@@ -36,8 +36,8 @@ pt operator * (ptT k, const pt &p){return {k * p.x, k * p.y};}
 std::istream& operator >> (istream& is, pt &p) {return is >> p.x >> p.y;}
 std::ostream& operator << (ostream& os, const pt &p) {return os << p.x << " " << p.y;}
 
-double angleCcw(const pt &a, const pt &b){return atan2(a ^ b, a * b);}
-double angleCcw(const pt &o, const pt &a, const pt &b){return angleCcw(a - o, b - o);}
+long double angleCcw(const pt &a, const pt &b){return atan2(a ^ b, a * b);}
+long double angleCcw(const pt &o, const pt &a, const pt &b){return angleCcw(a - o, b - o);}
 
 ptT triArea(const pt &o, const pt &a, const pt &b){return (b - o) ^ (a - o);}
 int orientation(const pt &o, const pt &a, const pt &b)
