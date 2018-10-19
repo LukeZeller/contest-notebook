@@ -8,15 +8,7 @@ struct line
     pt a, b, ab;
 
     line(){}
-    // PS: can remove bool if lines are always made using the same form
-    line(pt p, pt q, bool ptSlope = false)
-    {
-        a = p;
-        if (ptSlope)
-            ab = q, b = p + q;
-        else
-            ab = q - p, b = q;
-    }
+    line(pt p, pt q) : a(p), b(q), ab(q - p) {}
 
     bool onLine(const pt &p) {return abs(ab ^ (p - a)) < EPS;}
     bool onRay(const pt &p)
