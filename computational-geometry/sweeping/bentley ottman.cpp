@@ -1,8 +1,8 @@
 /*
 * Description: Bentley-Ottman algorithm for fhecking if a set of lines contains an intersection
-* Demo: "intersection" contains the indices of two lines that intersect if an intersection exists, otherwise set to {-1, -1}
-         Extending this to find all intersections is non-trivial (comparator for set must be modified to swap lines post-intersection, also need to store intersection candidates in priority queue)
+* Demo: returns the indices of two lines that intersect if an intersection exists, otherwise returns {-1, -1}
 *        If multiple intersections exist, the intersection with the minimum x-coordinate will be found
+*        Extending this to find all intersections is non-trivial (comparator for set must be modified to swap lines post-intersection, also need to store intersection candidates in priority queue)
 */
 
 typedef ld ptT;
@@ -87,60 +87,46 @@ struct event
     }
 };
 
-struct bentleyOttman
+ii bentleyOttman(const vector<line> &v)
 {
-    ii intersection = {-1, -1};
-
-    bentleyOttman(const vector<line> &v) // Caution!! make sure that the index field in line is filled out
+    vector <line> lines;
+    priority_queue <event, vector<event>, greater<event>> pq;
+    for (const line &l: v)
     {
-        vector <line> lines;
-        priority_queue <event, vector<event>, greater<event>> pq;
-        for (const line &l: v)
+        auto f = l.fix();
+        lines.push_back(f);
+        pq.push({f.a.x, 1, l.index});
+        pq.push({f.b.x, -1, l.index});
+    }
+    set <line> sweep;
+    map <int, set<line>::iterator> byIndex;
+    while (!pq.empty())
+    {
+        auto curr = pq.top();
+        pq.pop();
+
+        int ind = curr.index;
+        if (curr.type == 1)
         {
-            auto f = l.fix();
-            lines.push_back(f);
-            pq.push({f.a.x, 1, l.index});
-            pq.push({f.b.x, -1, l.index});
+            auto nxt = sweep.lower_bound(lines[ind]);
+            auto prv = nxt != sweep.begin() ? prev(nxt) : sweep.end();
+            if (nxt != sweep.end() and intersectionSegment(*nxt, lines[ind]))
+                return {nxt -> index, ind};
+            if (prv != sweep.end() and intersectionSegment(*prv, lines[ind]))
+                return {prv -> index, ind};
+            byIndex[ind] = sweep.insert(nxt, lines[ind]);
         }
-
-        set <line> sweep;
-        map <int, set<line>::iterator> byIndex;
-        while (!pq.empty())
+        else
         {
-            auto curr = pq.top();
-            pq.pop();
-
-            int ind = curr.index;
-            if (curr.type == 1)
-            {
-                auto nxt = sweep.lower_bound(lines[ind]);
-                auto prv = nxt != sweep.begin() ? prev(nxt) : sweep.end();
-                if (nxt != sweep.end() and intersectionSegment(*nxt, lines[ind]))
-                {
-                    intersection = make_pair(nxt -> index, ind);
-                    break;
-                }
-                if (prv != sweep.end() and intersectionSegment(*prv, lines[ind]))
-                {
-                    intersection = make_pair(prv -> index, ind);
-                    break;
-                }
-                byIndex[ind] = sweep.insert(nxt, lines[ind]);
-            }
-            else
-            {
-                auto it = byIndex[ind], nxt = next(it);
-                auto prv = it != sweep.begin() ? prev(it) : sweep.end();
-                if (nxt != sweep.end() and prv != sweep.end() and intersectionSegment(*nxt, *prv))
-                {
-                    intersection = {prv -> index, nxt -> index};
-                    break;
-                }
-                sweep.erase(prev(nxt));
-            }
+            auto it = byIndex[ind], nxt = next(it);
+            auto prv = it != sweep.begin() ? prev(it) : sweep.end();
+            if (nxt != sweep.end() and prv != sweep.end() and intersectionSegment(*nxt, *prv))
+                return {prv -> index, nxt -> index};
+            sweep.erase(prev(nxt));
         }
     }
-};
+    return {-1, -1};
+}
 
 int main()
 {
