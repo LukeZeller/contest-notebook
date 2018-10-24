@@ -1,11 +1,3 @@
-#include <bits/stdc++.h>
-
-using namespace std;
-
-typedef long long ll;
-
-const ll INF = 1LL << 63;
-
 /*
 * Description: KD-tree for k-nearest neighbor queries
 * Demo: query(q, k) returns vector of k (squared distance, point) pairs in order of smallest distance to largest distance (ie. the k-nearest neighbors)
