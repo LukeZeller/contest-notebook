@@ -131,8 +131,8 @@ ii bentleyOttman(const vector<line> &v)
 int main()
 {
     pt a = {0, 0}, b = {0, 5}, c = {5, 5}, d = {-10, 10}, e = {100, 100};
-    bentleyOttman bo({{a, b, 0}, {c, d, 1}, {b, e, 2}});
+    auto res = bentleyOttman({{a, b, 0}, {c, d, 1}, {b, e, 2}});
 
     // Expected: 1 2 (since a-b b-e intersection is later)
-    cout << bo.intersection.first << " " << bo.intersection.second << '\n';
+    cout << res.first << " " << res.second << '\n';
 }
