@@ -27,7 +27,7 @@ struct monotoneQueue
         sz--;
     }
 
-    T query() const {return elements.front();}
+    T query() const {return elements.front();} // Caution !! make sure that queue is non-empty before query
 };
 
 int main()
