@@ -4,16 +4,6 @@
 * Modification: find global longest path by replacing q.push(s) by placing all 0-inDegree nodes in queue
 */
 
-#include <iostream>
-#include <vector>
-#include <queue>
-
-using namespace std;
-
-#define ll long long
-
-const ll INF = 1e18;
-
 struct edge{int to, w;};
 typedef vector<vector<edge>> graph;
 
