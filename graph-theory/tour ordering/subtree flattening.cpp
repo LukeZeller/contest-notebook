@@ -35,5 +35,4 @@ int main()
     // Expected: 0 9, 1 6, 7 8, 2 3, 4 5
     for (int i = 0; i < n; i++)
         cout << in[i] << " " << out[i] << '\n';
-    cout << '\n';
 }
