@@ -1,18 +1,8 @@
 /*
 * Description: toposort using bfs
-* Demo: returns toposorted vertices and whether graph has cycle, unique ordering, or multiple orderings
+* Demo: returns toposorted vertices and whether graph has cycle (0), unique ordering (1), or multiple orderings (2)
 */
-
-#include <iostream>
-#include <vector>
-#include <queue>
-
-using namespace std;
-
-struct edge{int to;};
-typedef vector <vector<edge>> graph;
-
-pair <int, vector <int>> toposort(graph &g) //PS: modify return type as needed
+pair <int, vector <int>> toposort(graph &g) //PS: modify return type if only toposorted nodes required
 {
     int n = g.size();
     queue <int> q;
@@ -36,7 +26,7 @@ pair <int, vector <int>> toposort(graph &g) //PS: modify return type as needed
     }
     if (sorted.size() < n) return make_pair(0, sorted); //graph has cycle
     else return hasBranch ? make_pair(2, sorted) : make_pair(1, sorted); /*PS*/
-}
+} // 0: has cycle, 1: unique toposort ordering, 2: multiple toposort orderings
 
 void addEdge(graph &g, int i, int j)
 {
