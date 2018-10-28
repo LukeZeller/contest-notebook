@@ -80,3 +80,12 @@ pair <bool, pt> findIntersection(const line &m, const line &n, ii mtype, ii ntyp
     pt res = intersects ? m.a + m.ab * mt / denom : pt();
     return {intersects, res};
 }
+
+pair <bool, pt> simpleIntersection(const line &m, const line &n) // Caution !! Assumes that m and n are lines (not segments or rays)
+{
+    ptT denom = m.ab ^ n.ab;
+    if (abs(denom) < EPS) return {false, pt()}; // PS: assumes that parallel lines do not intersect
+    ptT mt = (n.a - m.a) ^ n.ab;
+    ptT nt = (n.a - m.a) ^ m.ab;
+    return {true, m.a + m.ab * mt / denom};
+}
