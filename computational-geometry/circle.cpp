@@ -50,7 +50,7 @@ ld intersectionArea(circle a, circle b)
     return res;
 }
 
-vector <line> tangents(circle a, circle b, bool exterior) // each tangent's direction will be from a to b (unless it's a single vertial tangent, then it'll be arbitrary)
+vector <line> findTangents(circle a, circle b, bool exterior) // each tangent's direction will be from a to b (unless it's a single vertial tangent, then it'll be arbitrary)
 {
     vector <line> res;
     if (!exterior) b.r *= -1;
