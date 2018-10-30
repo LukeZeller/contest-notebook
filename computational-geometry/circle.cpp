@@ -1,8 +1,9 @@
 /*
 * Description: circle operations
-* Demo: circle-circle intersection area, point inclusion, circle-circle inclusion, line-circle intersection, circle-circle tangets
+* Demo: circle-circle intersection area, point inclusion, circle-circle inclusion, line-circle intersection, 
+        circle-circle tangents, trimming vector of circles
 * Dependencies: trigonometry functions (angle_LOC, area_SAS), line class (distLine)
-              pt class (+, *, /, -, norm2()/dist2()/normalize(), rotateCw, perpCw
+              pt class (+, *, /, -, * product, norm2(), dist2(), normalize(), rotateCw, perpCw)
 */
 
 const ld PI = 3.14159265358979323846; // or acos(-1)
