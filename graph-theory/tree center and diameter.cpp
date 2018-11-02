@@ -2,9 +2,10 @@
 * Description: finding the center/diameter of a tree by deleting leaves
 * Demo: findCenters() returns vector containing the centers (1 or 2) of a tree - the nodes w/ the maximal shortest path to any other node
 *       diameter() finds the longest sh. path between any two nodes
+*       maxDistance() returns (distance, furthest node) pair, where distance is max path length from curr going away from prev (if != -1)
 */
 
-vector <int> findCenters(graph &g) // finds center(s) of undirected tree
+vector <int> findCenters(graph &g)
 {
     int n = g.size(), removed = 0;
     vector <int> degree(n), leaves;
@@ -25,7 +26,7 @@ vector <int> findCenters(graph &g) // finds center(s) of undirected tree
     return leaves;
 }
 
-pair <int, int> maxDistance(graph &g, int curr, int prev = -1) // returns (distance, furthest node) pair, where distance is maximal path length from curr going away from prev (if prev != -1)
+pair <int, int> maxDistance(graph &g, int curr, int prev = -1)
 {
     pair <int, int> res = {-1, curr};
     for (edge e: g[curr]) if (e.to != prev)
@@ -34,7 +35,7 @@ pair <int, int> maxDistance(graph &g, int curr, int prev = -1) // returns (dista
     return res;
 }
 
-int diameter(graph &g) // returns length of longest simple path between two nodes in undirected tree
+int diameter(graph &g)
 {
     int center = findCenters(g)[0];
     int mx1 = 0, mx2 = 0;
