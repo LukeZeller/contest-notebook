@@ -23,7 +23,7 @@ ld integrate(Function f, ld a, ld b, ld eps = EPS)
 }
 
 /* Optimized Simpson (use for computationally intensive tasks, ex. area of circle union) */
-inline ld fast_simpson(ld fl, ld fr, ld fm, ld l, ld r) { return (fl + fr + 4.0 * fm) *(r - l) / 6.0; }
+inline ld fast_simpson(ld fl, ld fr, ld fm, ld l, ld r) {return (fl + fr + 4.0 * fm) * (r - l) / 6.0;}
 
 template <class Function>
 ld fast_rsimpson(Function f, ld slr, ld fl, ld fr, ld fm, ld l, ld r, ld eps)
