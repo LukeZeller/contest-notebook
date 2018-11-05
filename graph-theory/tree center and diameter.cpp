@@ -35,19 +35,10 @@ pair <int, int> maxDistance(graph &g, int curr, int prev = -1)
     return res;
 }
 
-int diameter(graph &g)
+int diameter(graph &g, int start) // start can be any node in graph g
 {
-    int center = findCenters(g)[0];
-    int mx1 = 0, mx2 = 0;
-    for (edge e: g[center])
-    {
-        int possible = 1 + maxDistance(g, e.to, center).first;
-        if (possible > mx1)
-            tie(mx1, mx2) = make_pair(possible, mx1);
-        else if (possible > mx2)
-            mx2 = possible;
-    }
-    return mx1 + mx2;
+    int extreme = maxDistance(g, start).second;
+    return maxDistance(g, extreme).first;
 }
 
 int main()
