@@ -4,6 +4,14 @@
 * Dependency: gcd
 */
 
+template <typename T> T stot(const string &s) // only used in fraction(string) constructor
+{
+    T res;
+    istringstream iss(s);
+    iss >> res;
+    return res;
+}
+
 typedef long long fracT;
 struct fraction
 {
@@ -16,6 +24,28 @@ struct fraction
         num = a / g, denom = b / g;
         if (denom < 0)
             num = -num, denom = -denom;
+    }
+    fraction(const string &s, int numRepeating = 0) // if numRepeating != 0, assumes that '.' exists and last numRepeating digits are repeated
+    {
+        auto it = s.find('.');
+        if (it == string::npos)
+            *this = fraction(stot<fracT>(s), 1);
+        else
+        {
+            auto whole = s.substr(0, it);
+            auto dec = s.substr(it + 1, s.length() - it - numRepeating - 1);
+            auto rep = s.substr(s.length() - numRepeating, numRepeating);
+
+            fracT pow10 = 1, nines = 0;
+            for (int i = 0; i < dec.length(); i++)
+                pow10 *= 10;
+            for (int i = 0; i < rep.length(); i++)
+                nines = nines * 10 + 9;
+            
+            *this = (!whole.empty() ? fraction(stot<fracT>(whole), 1) : fraction()) +
+                    (!dec.empty() ? fraction(stot<fracT>(dec), pow10) : fraction()) +
+                    (!rep.empty() ? fraction(stot<fracT>(rep), nines * pow10) : fraction());
+        }
     }
     fraction(ld d)
     {
