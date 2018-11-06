@@ -4,6 +4,8 @@
 *       isPalindrome(s) returns true if vector/istring/etc is a palindrome
 */
 
+typedef basic_string<int> istring;
+
 template <class T> bool isPalindrome(const T &s)
 {
     return s == T(s.rbegin(), s.rend());
