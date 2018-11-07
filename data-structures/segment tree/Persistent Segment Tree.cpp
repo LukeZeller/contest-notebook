@@ -1,17 +1,11 @@
 /*
-* Description: persistent segment tree
-* Demo: increment range update, max range query, 
-  modify (in segment tree) returns root of the new tree
+* Description: persistent segment tree (able to query old versions of tree without storing all of them separately)
+* Demo: increment range update, max range query
 */
 
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
-struct node /*PS*/
+struct node
 {
-    int sum = 0;
+    int l = -1, r = -1, sum = 0;
 
     void init(int i){sum = i;}
     void modify(int v){sum += v;}
@@ -24,76 +18,81 @@ struct node /*PS*/
 
 struct segmentTree
 {
-    node n;
-    int lb, rb;
-    segmentTree *l, *r;
+    int sz;
+    vector <node> elements;
+    vector <int> roots;
 
     segmentTree(){}
-    segmentTree(vector <int> &v) : segmentTree(0, v.size() - 1, v) {} //PS: can use def instead of v
-    segmentTree(int ql, int qr, vector <int> &v) : lb(ql), rb(qr) /*PS*/
+    segmentTree(const vector <int> &v) : sz(v.size()) {roots.push_back(build(v, 0, sz - 1));} //PS: can use def instead of v
+
+    int build(const vector <int> &v, int lb, int rb) /*PS*/
     {
-        if (lb == rb){n.init(v[lb]); return;} /*PS*/
-        int m = (lb + rb) >> 1;
-        l = new segmentTree(lb, m, v), r = new segmentTree(m + 1, rb, v); //PS: same as above
-        n.combine(l -> n, r -> n);
+        int ind = elements.size();
+        elements.push_back(node());
+        if (lb == rb)
+            elements[ind].init(v[lb]);
+        else
+        {
+            int m = (lb + rb) >> 1;
+            int t1 = build(v, lb, m), t2 = build(v, m + 1, rb);
+            elements[ind].l = t1, elements[ind].r = t2;
+            elements[ind].combine(elements[t1], elements[t2]);
+        }
+        return ind;
     }
 
-    int query(int l, int r){return queryn(l, r).sum;} /*PS*/
-    node queryn(int ql, int qr)
+    int query(int version, int l, int r){return query(roots[version], l, r, 0, sz - 1).sum;} /*PS*/
+    node query(int ind, int ql, int qr, int lb, int rb)
     {
         if (lb > qr or rb < ql) return node();
-        if (lb >= ql and rb <= qr) return n;
-        return acc.combine(l -> queryn(ql, qr), r -> queryn(ql, qr));
+        if (lb >= ql and rb <= qr) return elements[ind];
+        int m = (lb + rb) >> 1;
+        return acc.combine(query(elements[ind].l, ql, qr, lb, m), query(elements[ind].r, ql, qr, m + 1, rb));
     }
 
-    segmentTree* modify(int qp, int v)
+    void modify(int p, int v){roots.push_back(modify(roots.back(), p, v, 0, sz - 1));}
+    int modify(int ind, int qp, int v, int lb, int rb)
     {
-        if (lb > qp or rb < qp) return this;
+        if (lb > qp or rb < qp) return ind;
+        node nd(elements[ind]);
         if (lb == rb)
+            nd.modify(v);
+        else
         {
-            segmentTree* st = new segmentTree(*this);
-            st -> n.modify(v);
-            return st;
+            nd.l = modify(elements[ind].l, qp, v, lb, (lb + rb) / 2);
+            nd.r = modify(elements[ind].r, qp, v, (lb + rb) / 2 + 1, rb);
+            nd.combine(elements[nd.l], elements[nd.r]);
         }
-        segmentTree* st = new segmentTree(*this);
-        st -> l = l -> modify(qp, v), st -> r = r -> modify(qp, v);
-        st -> n.combine(st -> l -> n, st -> r -> n);
-        return st;
+        int new_ind = elements.size();
+        elements.push_back(nd);
+        return new_ind;
     }
 };
-
-typedef vector<segmentTree> segmentTreePs;
-void modify(segmentTreePs &st, int p, int v)
-{
-    st.push_back(*st.back().modify(p, v));
-}
 
 int main()
 {
     vector <int> a = {1, 3, 5, 2, 9};
-    segmentTreePs st = {segmentTree(a)};
+    segmentTree st(a);
 
     //Expected: 20
-    cout<<st[0].query(0, 4)<<'\n';
+    cout<<st.query(0, 0, 4)<<'\n';
 
     //Expected: 4 8 7 11
-    for (int i = 0; i + 1 < 5; i++) cout<<st[0].query(i, i + 1)<<" ";
+    for (int i = 0; i + 1 < 5; i++) cout<<st.query(0, i, i + 1)<<" ";
     cout<<'\n';
 
-    modify(st, 0, 2);
+    st.modify(0, 2);
     //Expected: 11 13
-    for (int i = 0; i < st.size(); i++) cout<<st[i].query(0, 3)<<" ";
+    for (int i = 0; i < st.roots.size(); i++) cout<<st.query(i, 0, 3)<<" ";
     cout<<'\n';
 
-    modify(st, 2, 5);
+    st.modify(2, 5);
     //Expected: 9 11 16
-    for (int i = 0; i < st.size(); i++) cout<<st[i].query(0, 2)<<" ";
+    for (int i = 0; i < st.roots.size(); i++) cout<<st.query(i, 0, 2)<<" ";
     cout<<'\n';
 
-    modify(st, 4, -10);
+    st.modify(4, -10);
     //Expected: 9 9 9 -1
-    for (int i = 0; i < st.size(); i++) cout<<st[i].query(4, 4)<<" ";
+    for (int i = 0; i < st.roots.size(); i++) cout<<st.query(i, 4, 4)<<" ";
     cout<<'\n';
-
-    return 0;
 }
