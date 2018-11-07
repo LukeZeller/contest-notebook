@@ -1,50 +1,40 @@
 /*
-* Description: disjoint set union on trees
+* Description: disjoint set union on rooted trees (use if you can calculate all needed information for a node after processing its subtree)
+* Demo: finds # of odd-indexed nodes in each node's subtree
 */
-
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
-struct edge{int to;};
-typedef vector <vector<edge>> graph;
 
 struct dsuOnTree
 {
-    int sz, timer = 0;
     graph g;
-    vector <int> st, ft, ordered, sizes;
+    int sz, timer = 0;
+    vector <int> in, out, ordered, sizes;
 
     vector <int> sols;
-    //PS: other PS parameters
+    int numOdd = 0; //PS: replace w/ problem specific parameters
 
-    dsuOnTree(graph &gr)
+    dsuOnTree(graph &gr) : g(gr), sz(g.size()), in(sz), out(sz), ordered(sz), sizes(sz), sols(sz)
     {
-        g = gr, sz = g.size();
-        st.resize(sz), ft.resize(sz), ordered.resize(sz), sizes.resize(sz);
-        sols.resize(sz); //PS: Initialize PS parameters
         tour(), dfs();
     }
 
     int tour(int curr = 0, int prev = -1)
     {
         sizes[curr] = 1;
-        ordered[timer] = curr, st[curr] = timer++;
+        ordered[timer] = curr, in[curr] = timer++;
         for (edge e: g[curr]) if (e.to != prev)
             sizes[curr] += tour(e.to, curr);
-        ft[curr] = timer;
+        out[curr] = timer;
         return sizes[curr];
     }
 
-    void add(int v)
+    void add(int i) //PS: modify PS parameters for when node v is updated
     {
-        //PS: modify PS parameters for when node v is added
+        numOdd += i & 1;
     }
 
-    void rmv(int v)
+    void rmv(int i) //PS: modify PS parameters for when node v is removed
     {
-       //PS: modify PS parameters for when node v is removed
+        numOdd -= i & 1;
     }
 
     void dfs(int curr = 0, int prev = -1, bool keep = false)
@@ -57,22 +47,23 @@ struct dsuOnTree
         if (heavy != -1)
             dfs(heavy, curr, true);
         for (edge e: g[curr]) if (e.to != prev and e.to != heavy)
-            for (int t = st[e.to]; t < ft[e.to]; t++)
+            for (int t = in[e.to]; t < out[e.to]; t++)
                 add(ordered[t]);
         add(curr);
-        sols[curr] = //PS: set solution for curr node using PS parameters
+        sols[curr] = numOdd; //PS: set solution for curr node using PS parameters
         if (keep) return;
-        for (int t = st[curr]; t < ft[curr]; t++)
+        for (int t = in[curr]; t < out[curr]; t++)
             rmv(ordered[t]);
     }
 };
 
 int main()
 {
-    graph g;
+    graph g(5);
+    g[0] = {{1}, {2}}, g[1] = {{0}}, g[2] = {{0}, {3}, {4}}, g[3] = {{2}}, g[4] = {{2}};
     dsuOnTree dsu(g);
-    for (auto i: dsu.sols) cout<<i<<" ";
+    // Expected: 2 1 1 1 0
+    for (auto i: dsu.sols)
+        cout << i << " ";
     cout<<'\n';
-
-    return 0;
 }
