@@ -5,14 +5,6 @@
 * Dependencies: segment tree (implementation depends on update/queries required)
 */
 
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
-struct edge{int to;};
-typedef vector <vector<edge>> graph;
-
 struct heavyLightDecomposition
 {
     int sz, timer = 0;
@@ -93,11 +85,3 @@ struct heavyLightDecomposition
         return st.query(position[p], endpos[p]);
     }
 };
-
-int main()
-{
-    graph g;
-    heavyLightDecomposition hld(g, false);
-
-    return 0;
-}
