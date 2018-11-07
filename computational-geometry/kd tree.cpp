@@ -3,6 +3,7 @@
 * Demo: query(q, k) returns vector of k (squared distance, point) pairs in order of smallest distance to largest distance (ie. the k-nearest neighbors)
 */
 
+
 typedef ll ptT;
 struct pt
 {
