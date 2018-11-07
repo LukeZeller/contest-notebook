@@ -3,19 +3,10 @@
 * Demo: space efficient capacity/flow storage, flow can be reset
 */
 
-#include <iostream>
-#include <vector>
-#include <queue>
-#include <algorithm>
-
-using namespace std;
-
-const int INF = 1231231234;
-
 struct edge{int to, id;};
 typedef vector<vector<edge>> graph;
-typedef int flowT; /*PS*/
 
+typedef int flowT; /*PS*/
 struct dinic
 {
     int sz;
