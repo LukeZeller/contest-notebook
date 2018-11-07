@@ -22,13 +22,8 @@ struct dinic
     graph g;
     vector <flowT> capacities, flow;
     vector <int> level, startEdge;
-    vector <bool> cut; //PS: S: true, T: false
 
-    dinic(int s)
-    {
-        sz = s, g.resize(sz);
-        level.resize(sz), startEdge.resize(sz), cut.resize(sz);
-    }
+    dinic(int s) : sz(s), g(sz), level(sz), startEdge(sz) {}
 
     void addEdge(int from, int to, flowT capacity)
     {
@@ -87,16 +82,7 @@ struct dinic
             fill(startEdge.begin(), startEdge.end(), 0);
             while (flowT delta = blockingFlow(source, sink)) res += delta;
         }
-        findcut(source); //PS: only if min-cut is needed
         return res;
-    }
-
-    void findcut(int curr) /*PS*/
-    {
-        if (cut[curr]) return;
-        cut[curr] = true;
-        for (edge e: g[curr]) if (!cut[e.to] and residual(e.id) > 0)
-            findcut(e.to);
     }
 };
 
@@ -124,6 +110,4 @@ int main()
 
     //Expected: 11
     cout<<dnc.maxflow(source, sink)<<'\n';
-
-    return 0;
 }
