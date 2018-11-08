@@ -1,6 +1,6 @@
 /*
 * Description: Misc. network flow theorems and tricks
-* Demo:
+* Demo: Hall's marriage thm, Konig's thm, disconnecting defective nodes, edge/vertex disjoint path, suboptimal global min-cut
 */
 
 Hall's marriage theorem for bipartite graphs:
