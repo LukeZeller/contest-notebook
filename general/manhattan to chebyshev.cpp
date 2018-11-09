@@ -1,8 +1,9 @@
 /*
-* Description: convert points in manhattan metric to chebyshev metric
-*              Rotates all points clockwise and scales by some amount (probably sqrt 2)
-* Application: To find longest path if a point can go to all points within lines w/ slope 1/r and -1/r, scale all points with r (so 90 degrees between lines)
-*              then convert to chebyshev, sort lexicographically by (x, y), then find longest non-decreasing subsequence wrt y
+* Description: convert points in manhattan metric: |x2 - x1| + |y2 - y1| to chebyshev metric: max(|x2 - x1|, |y2 - y1|)
+* Application: To find longest path if a point can go to all points within lines w/ slope 1/r and -1/r
+*              scale all points with r (so 90 degrees between lines)
+*              then convert to chebyshev, sort lexicographically by (x, y) [ie. first by x, tie-break w/ y]
+*              then find longest non-decreasing subsequence wrt y
 */
 
 pt toChebyshev(pt p)
