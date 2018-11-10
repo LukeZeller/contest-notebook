@@ -35,7 +35,23 @@ int lineIntersectsCircle(const line &l, const circle &c)
     return diff <= -EPS ? -1 : (diff >= EPS ? 1 : 0);
 } // -1 : intersects at 2 points, 0 : intersects at 1 point, 1 : no intersection
 
-ld intersectionArea(circle a, circle b)
+vector <pt> findLineCircleIntersection(const line &l, const circle &c)
+{
+    vector <pt> intersections;
+    ld d = l.distLine(c.center), h2 = c.r * c.r - d * d;
+    if (h2 > -EPS)
+    {
+        h2 = max(ld(0), h2);
+        pt p = l.projection(c.center);
+        pt h = l.ab * sqrt(h2) / sqrt(l.ab.norm2());
+        intersections = {p - h, p + h};
+        if (h2 < EPS)
+            intersections.pop_back();
+    }
+    return intersections;
+}
+
+ld circleCircleIntersectionArea(circle a, circle b)
 {
     auto c1 = a.center, c2 = b.center;
     auto r1 = a.r, r2 = b.r, d = sqrt(c1.dist2(c2));
