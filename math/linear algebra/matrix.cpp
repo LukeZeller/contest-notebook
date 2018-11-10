@@ -17,7 +17,7 @@ matrix operator * (const matrix &a, const matrix &b)
     for (int i = 0; i < a.size(); ++i)
         for (int k = 0; k < b.size(); ++k)
             for (int j = 0; j < b[0].size(); ++j)
-                c[i][j] = (c[i][j] + (ll) a[i][k] * b[k][j]) % MOD; //PS: remove MOD if using doubles
+                c[i][j] = (c[i][j] + (ll) a[i][k] * b[k][j]) % MOD; //PS: remove MOD and (ll) typecast if using doubles
     return c;
 }
 
