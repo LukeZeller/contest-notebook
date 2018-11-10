@@ -66,6 +66,27 @@ ld circleCircleIntersectionArea(circle a, circle b)
     return res;
 }
 
+pair <ld, vector<pt>> findCircleCircleIntersection(const circle &a, const circle &b) // intersections are from left to right wrt a's center, ie. orient(a.center, p[0], p[1]) = 1
+{
+    vector <pt> intersections;
+    auto c1 = a.center, c2 = b.center;
+    auto r1 = a.r, r2 = b.r, d = sqrt(c1.dist2(c2));
+    if (c1.dist2(c2) + EPS >= (r1 + r2) * (r1 + r2))
+        return {0, {}};
+    if (c1.dist2(c2) <= (r2 - r1) * (r2 - r1) + EPS)
+        return {PI * min(r1, r2) * min(r1, r2), {}}; // PS: don't return intersection points if concentric
+    auto alpha = angle_LOC(r1, d, r2);
+    auto beta = angle_LOC(r2, d, r1);
+    auto v = (c2 - c1) * r1 / d;
+    intersections = {c1 + v.rotateCcw(alpha), c1 + v.rotateCw(alpha)};
+    if (intersections[0] == intersections[1])
+        intersections.pop_back();
+    alpha *= 2, beta *= 2;
+    auto res = alpha * r1 * r1 / 2.0 - area_SAS(r1, r1, alpha)
+             + beta * r2 * r2 / 2.0 - area_SAS(r2, r2, beta);
+    return {res, intersections};
+}
+
 vector <line> findTangents(circle a, circle b, bool exterior) // each tangent's direction will be from a to b (unless it's a single vertial tangent, then it'll be arbitrary)
 {
     vector <line> res;
