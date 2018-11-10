@@ -1,15 +1,8 @@
 /*
 * Description: divide and conquer on trees
-* Demo: process(), solveSubtree(), refresh() allow for finding solution separately from updating parameters
+* Demo: Finds # of pair of nodes that are exactly k-edges away from each other
+*       solveSubtree()/refresh() allow for updating solution (solveSubtree) separately, before updating parameters (refresh)
 */
-
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
-struct edge{int to, w;};
-typedef vector <vector<edge>> graph;
 
 struct centroidDecomposition
 {
@@ -17,20 +10,18 @@ struct centroidDecomposition
     graph g;
     vector <int> sizes, blocked;
 
-    int sol = 0; //PS: max: -INF, min: INF, sum: 0
-    //PS: other PS parameters
+    ll sol = 0;
+    int k; vector <int> numAtDistance; //PS: other PS parameters
 
-    centroidDecomposition(graph &gr)
+    centroidDecomposition(graph &gr, int _k) : sz(gr.size()), g(gr), sizes(sz), blocked(sz) //PS: _k is a PS parameter
     {
-        g = gr, sz = g.size();
-        sizes.resize(sz), blocked.resize(sz);
-        //PS: Initialize PS parameters
+        k = _k, numAtDistance.resize(k + 1); //PS: Initialize PS parameters
         decompose(0);
     }
 
     void decompose(int curr, int prev = -1)
     {
-        curr = findCentroid(calcSize(curr), curr);
+        curr = findCentroid(calcSize(curr), curr); // Can build centroid graph after this line, make edge from prev (if != -1) to curr, and set parent[curr] = prev (even if par = -1)
         blocked[curr] = true, solveNode(curr);
         for (edge e: g[curr]) if (e.to != prev and !blocked[e.to])
             decompose(e.to, curr);
@@ -50,54 +41,56 @@ struct centroidDecomposition
         {
             old = curr;
             for (edge e: g[curr]) if (e.to != prev and !blocked[e.to] and sizes[e.to] > total / 2)
-            {
-                curr = e.to; break;
-            }
+                curr = e.to;
         }
         return curr;
     }
 
-    void solveNode(int curr, int prev = -1)
+    void solveNode(int curr)
     {
-        for (edge e: g[curr]) if (e.to != prev and !blocked[e.to])
+        fill(numAtDistance.begin(), numAtDistance.end(), 0); // PS: reset any global parameters that are independent for each centroid
+        numAtDistance[0] = 1; //PS: already have a "previous" path of length 0
+        for (edge e: g[curr]) if (!blocked[e.to])
         {
-            solveSubtree(e.to, curr);
-            refresh(e.to, curr);
+            solveSubtree(e.to, curr); // Update solution for e.to branch using paths to previous branches'
+            refresh(e.to, curr); // Update data about "previous branches" to include e.to
         }
     }
 
     template <class Operation>
-    void process(int curr, int prev, Operation op) //PS: only need following functions if updates cannot be done while solving
+    void process(int curr, int prev, int dist, Operation op) //PS: problem specific parameter (dist) used here to update numAtDistance and solution
     {
-        op(); //PS: parameters should be info needed to find subtree solution
+        op(dist); //PS: parameters should be info needed to find subtree solution/update global parameters (ex. numAtDistance)
         for (edge e: g[curr]) if (e.to != prev and !blocked[e.to])
         {
-            process(e.to, curr, op); /*PS*/
+            process(e.to, curr, dist + 1, op); // PS: parameters change as mentioned above
         }
     }
 
-    void solveSubtree(int curr, int prev)
+    void solveSubtree(int branch, int centroid)
     {
-        process(curr, prev, [this]()
+        process(branch, centroid, 1, [this](int dist) //PS: third parameter is 1 b/c we start at child (AKA branch), which is already 1 distance from the centroid
         {
-            //PS: modify value of sol here
+            if (dist <= k)
+                sol += numAtDistance[k - dist];  //PS: modify value of sol here
         });
     }
 
-    void refresh(int curr, int prev)
+    void refresh(int branch, int centroid)
     {
-        process(curr, prev, [this]()
+        process(branch, centroid, 1, [this](int dist) //PS: same idea as above about third parameter
         {
-            //PS: update PS parameters here
+            if (dist <= k)
+                numAtDistance[dist]++; //PS: update PS parameters here
         });
     }
 };
 
 int main()
 {
-    graph g;
-    centroidDecomposition cd(g);
-    cout<<cd.sol<<'\n';
-
-    return 0;
+    graph g(5);
+    g[0] = {{1}}, g[1] = {{0}, {2}}, g[2] = {{1}, {3}, {4}}, g[3] = {{2}}, g[4] = {{2}};
+    centroidDecomposition cd2(g, 2), cd3(g, 3);
+    // Expected: 4 2
+    cout << cd2.sol << " " << cd3.sol << '\n';
 }
